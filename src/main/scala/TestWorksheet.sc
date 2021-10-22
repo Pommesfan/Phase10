@@ -35,3 +35,9 @@ val field = new PlayingField(
   0)
 
 case class PlayingField(players: List[String], activePlayer:Int, cards:List[List[Card]])
+
+val field = PlayingField(
+  List("Player A", "Player B"),
+  0,
+  List.fill(NUMBER_OF_PLAYERS)(createPlayerCardStash)
+)
