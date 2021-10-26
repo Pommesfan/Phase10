@@ -7,3 +7,14 @@ class Test1:
     nextPlayer(1, 4) should be(2)
     nextPlayer(2, 4) should be(3)
     nextPlayer(3, 4) should be(0)
+    
+    val c = createCard
+    c.color >= 1 && c.color <= 4 should be(true)
+    c.value >= 1 && c.value <= 12 should be(true)
+    
+    val stash = createCardStash(2)
+    stash.size should be(2)
+    for (l <- stash)
+        l.size should be(10)
+        
+    
