@@ -14,14 +14,7 @@ object Main {
     var openCard = createCard
 
     while (true)
-      println("Aktueller Spieler: " + players(current_player))
-      println("Offenliegende Karte")
-      println(openCard)
-      println("Karten des Spielers:")
-      for (c <- cardStash(current_player))
-        println(c)
-
-      println("Auszutauschende Karte angeben")
+      printPlayerStatus(players(current_player), cardStash(current_player), openCard)
       val card_index = s.nextInt()
       val result = change_card(card_index, current_player, openCard, cardStash)
       cardStash = result._1
@@ -29,6 +22,18 @@ object Main {
 
       current_player = nextPlayer(current_player, players.length)
 }
+
+def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : String =
+  val sb = new StringBuilder
+  sb.append("Aktueller Spieler: " + player)
+  sb.append("\n\nOffenliegende Karte: \n")
+  sb.append(openCard)
+  sb.append("\n\nKarten des Spielers:\n")
+  cards.foreach(c => sb.append(c.toString + '\n'))
+  sb.append("\nAuszutauschende Karte angeben")
+  println(sb)
+  sb.toString()
+
 
 def msg = "I was compiled by Scala 3. :)"
 

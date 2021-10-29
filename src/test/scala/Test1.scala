@@ -28,6 +28,24 @@ class Test1 extends AnyWordSpec:
         }
 
         "methods for game controll are correct" when {
+            "printing status of current player" when {
+                val s = printPlayerStatus("Hallo", (List.fill(10)(createCard)), createCard)
+                val stringlist = s.split("\n").toList
+                "prints current player" in {
+                    stringlist(0) should be("Aktueller Spieler: Hallo")
+                    stringlist(1) should be("")
+                }
+                "prints open card" in {
+                    stringlist(2) should be("Offenliegende Karte: ")
+                    stringlist(3).matches("Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))") should be(true)
+                    stringlist(4) should be("")
+                }
+                "prints playercardstash" in {
+                    stringlist(5) should be("Karten des Spielers:")
+                    for(i <- 6 until 16)
+                        stringlist(i).matches("Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))") should be(true)
+                }
+            }
             "nextplayer return following number but zero if it would be beyond number of players" in {
                 nextPlayer(0, 4) should be(1)
                 nextPlayer(1, 4) should be(2)
