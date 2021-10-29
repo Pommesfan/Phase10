@@ -41,3 +41,5 @@ val field = PlayingField(
   0,
   List.fill(NUMBER_OF_PLAYERS)(createPlayerCardStash)
 )
+
+"Farbe: Grün; Wert = 13".matches("Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))")
