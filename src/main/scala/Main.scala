@@ -1,32 +1,34 @@
 import java.util.Scanner
 import scala.util.Random
 
-@main def hello: Unit =
-  println("I am cardgame Phase10!")
-  println(msg)
+object Main {
+  @main def hello: Unit =
+    println("I am cardgame Phase10!")
+    println(msg)
 
-  val s = new Scanner(System.in)
+    val s = new Scanner(System.in)
 
-  val players = s.nextLine().split(" ")
-  var current_player = 0
-  var cardStash = createCardStash(players.length)
-  var openCard = createCard
+    val players = s.nextLine().split(" ")
+    var current_player = 0
+    var cardStash = createCardStash(players.length)
+    var openCard = createCard
 
-  while(true)
-    println("Aktueller Spieler: " + players(current_player))
-    println("Offenliegende Karte")
-    println(openCard)
-    println("Karten des Spielers:")
-    for(c <- cardStash(current_player))
-      println(c)
+    while (true)
+      println("Aktueller Spieler: " + players(current_player))
+      println("Offenliegende Karte")
+      println(openCard)
+      println("Karten des Spielers:")
+      for (c <- cardStash(current_player))
+        println(c)
 
-    println("Auszutauschende Karte angeben")
-    val card_index = s.nextInt()
-    val result = change_card(card_index, current_player, openCard, cardStash)
-    cardStash = result._1
-    openCard = result._2
+      println("Auszutauschende Karte angeben")
+      val card_index = s.nextInt()
+      val result = change_card(card_index, current_player, openCard, cardStash)
+      cardStash = result._1
+      openCard = result._2
 
-    current_player = nextPlayer(current_player, players.length)
+      current_player = nextPlayer(current_player, players.length)
+}
 
 def msg = "I was compiled by Scala 3. :)"
 
