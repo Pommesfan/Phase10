@@ -60,12 +60,4 @@ case class Card(color:Int, value:Int) {
     }
     "Farbe: " + colorName + "; Wert = " + value.toString
   }
-
-  override def equals(obj: Any): Boolean = {
-    if(!obj.isInstanceOf[Card])
-      false
-    else
-      def c = obj.asInstanceOf[Card]
-      c.value == value && c.color == color
-  }
 }
