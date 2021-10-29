@@ -43,7 +43,7 @@ private def createCard: Card = Card(randomColor + 1, randomValue + 1)
 
 private def createCardStash(numberOfPlayers:Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
 
-private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldCardStash: List[List[Card]]): (List[List[Card]], Card) = {
+private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldCardStash: List[List[Card]]): (List[List[Card]], Card) =
   def oldSubList = oldCardStash(playerIndex)
   def newSubList = oldSubList.updated(cardIndex, oldOpenCard)
 
@@ -51,7 +51,6 @@ private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldC
   def leftCard = oldSubList(cardIndex)
 
   (newStash, leftCard)
-}
 
 val r = new Random()
 def randomColor = r.nextInt(4)
