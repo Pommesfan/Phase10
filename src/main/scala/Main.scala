@@ -2,11 +2,11 @@ import java.util.Scanner
 import scala.util.Random
 
 object Main {
+  val s = new Scanner(System.in)
+
   @main def hello: Unit =
     println("I am cardgame Phase10!")
     println(msg)
-
-    val s = new Scanner(System.in)
 
     val players = s.nextLine().split(" ")
     var current_player = 0
