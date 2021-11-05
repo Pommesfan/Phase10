@@ -75,18 +75,14 @@ class Test1 extends AnyWordSpec:
             "changing cards" when {
                 //Test of changing cards
                 def CHANGED_CARD = 8
-
                 def PLAYER_INDEX = 1
-
                 def NUMBER_OF_PLAYERS = 2
 
                 val openCard = createCard
                 val stash2 = createCardStash(NUMBER_OF_PLAYERS)
-
                 val result = change_card(CHANGED_CARD, PLAYER_INDEX, openCard, stash2)
 
                 def newStash = result._1
-
                 def newOpenCard = result._2
 
                 "selected card is replaced with open card" in {
