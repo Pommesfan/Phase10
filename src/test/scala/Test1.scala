@@ -104,5 +104,26 @@ class Test1 extends AnyWordSpec:
                                 stash2(p)(c).equals(newStash(p)(c)) should be(true)
                 }
             }
+            "moves cards from stash to discarded-stash" when {
+                val NUMBER_OF_PLAYERS = 2
+                val stash = createCardStash(NUMBER_OF_PLAYERS)
+                val discardedStash = List.fill(NUMBER_OF_PLAYERS)(List[Card]())
+                val INDICES = List(0,1,2)
+                val res = discard_cards(1, INDICES, stash, discardedStash)
+                "moves cards of current player correctly" in {
+                    val newStash = res._1
+                    val newDiscardedStash = res._2
+                    newStash(1).size should be(7)
+                    newStash(0).size should be(10)
+                    newDiscardedStash(1).size should be(3)
+                    newDiscardedStash(0).size should be(0)
+                }
+            }
+            "make inverse index list" when {
+                val indices = List(4,5,6,7)
+                "returns indexes from 1 to 10 except of the ones just defined" in {
+                    inverseIndexList(indices, 10) should be(List(0,1,2,3,8,9))
+                }
+            }
         }
     }

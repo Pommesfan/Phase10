@@ -1,3 +1,5 @@
+import Main.s
+
 import java.util.Scanner
 import scala.util.Random
 
@@ -12,13 +14,25 @@ object Main {
     var current_player = 0
     var cardStash = createCardStash(players.length)
     var openCard = createCard
+    var discardedStash = List.fill(players.size)(List[Card]())
+    var player_has_discarded = Array.fill(players.size)(false)
 
     while (true)
       printPlayerStatus(players(current_player), cardStash(current_player), openCard)
-      val card_index = s.nextInt()
+      val card_index = s.nextLine().toInt
       val result = change_card(card_index, current_player, openCard, cardStash)
       cardStash = result._1
       openCard = result._2
+
+      if(!player_has_discarded(current_player))
+        val discard_input = getCardsToDiscard()
+        //apply changes if cards to discard selected
+        if(discard_input.nonEmpty)
+          val card_indices = discard_input.get
+          val result_discard = discard_cards(current_player, card_indices, cardStash, discardedStash)
+          cardStash = result_discard._1
+          discardedStash = result_discard._2
+          player_has_discarded(current_player) = true
 
       current_player = nextPlayer(current_player, players.length)
 }
@@ -34,6 +48,14 @@ def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : Strin
   println(sb)
   sb.toString()
 
+
+def getCardsToDiscard():Option[List[Int]] =
+  println("Abzulegende Karten angeben oder n für nicht ablegen")
+  val input = s.nextLine()
+  if(input == "n")
+    None
+  else
+    Some(input.split(" ").map(n => n.toInt).toList)
 
 def msg = "I was compiled by Scala 3. :)"
 
@@ -51,6 +73,21 @@ private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldC
   def leftCard = oldSubList(cardIndex)
 
   (newStash, leftCard)
+
+private def discard_cards(current_player: Int, card_indices: List[Int], cardStash:List[List[Card]], discardedStash:List[List[Card]]): (List[List[Card]], List[List[Card]]) =
+  def playerCards = cardStash(current_player)
+  def sublist_newCardstash = inverseIndexList(card_indices, cardStash(current_player).size).map(n => playerCards(n))
+  def sublist_newDiscardedCards = card_indices.map(n => playerCards(n))
+  def newCardStash = cardStash.updated(current_player, sublist_newCardstash)
+  def newDiscardedStash = discardedStash.updated(current_player, sublist_newDiscardedCards)
+  (newCardStash, newDiscardedStash)
+
+private def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
+  var new_index_list = List[Int]()
+  for(i <- 0 until maxIndex)
+    if(!indexList.contains(i))
+      new_index_list = i::new_index_list
+  new_index_list.reverse
 
 val r = new Random()
 def randomColor = r.nextInt(4)
