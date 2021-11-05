@@ -1,7 +1,7 @@
 import Main.s
-
 import java.util.Scanner
 import scala.util.Random
+import model.Card
 
 object Main {
   val s = new Scanner(System.in)
@@ -97,15 +97,3 @@ private def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
 val r = new Random()
 def randomColor = r.nextInt(4)
 def randomValue = r.nextInt(12)
-
-case class Card(color:Int, value:Int) {
-  override def toString: String = {
-    def colorName: String = color match {
-      case 1 => "Rot"
-      case 2 => "Gelb"
-      case 3 => "Blau"
-      case 4 => "Grün"
-    }
-    "Farbe: " + colorName + "; Wert = " + value.toString
-  }
-}
