@@ -84,9 +84,10 @@ private def discard_cards(current_player: Int, card_indices: List[Int], cardStas
 
 private def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
   var new_index_list = List[Int]()
-  for(i <- 0 until maxIndex)
+  (0 until maxIndex).foreach(i =>
     if(!indexList.contains(i))
       new_index_list = i::new_index_list
+  )
   new_index_list.reverse
 
 val r = new Random()
