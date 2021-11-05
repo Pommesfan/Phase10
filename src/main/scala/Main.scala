@@ -20,7 +20,8 @@ object Main {
     while (true)
       printPlayerStatus(players(current_player), cardStash(current_player), openCard)
       val card_index = s.nextLine().toInt
-      val result = change_card(card_index, current_player, openCard, cardStash)
+      val mode = s.nextLine()
+      val result = change_card(card_index, current_player, openCard, cardStash, mode)
       cardStash = result._1
       openCard = result._2
 
@@ -44,7 +45,7 @@ def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : Strin
   sb.append(openCard)
   sb.append("\n\nKarten des Spielers:\n")
   cards.foreach(c => sb.append(c.toString + '\n'))
-  sb.append("\nAuszutauschende Karte angeben")
+  sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
   println(sb)
   sb.toString()
 
@@ -65,9 +66,12 @@ private def createCard: Card = Card(randomColor + 1, randomValue + 1)
 
 private def createCardStash(numberOfPlayers:Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
 
-private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldCardStash: List[List[Card]]): (List[List[Card]], Card) =
+private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldCardStash: List[List[Card]], mode: String): (List[List[Card]], Card) =
   def oldSubList = oldCardStash(playerIndex)
-  def newSubList = oldSubList.updated(cardIndex, oldOpenCard)
+  def newSubList =
+    if(mode == "open") oldSubList.updated(cardIndex, oldOpenCard)
+    else if(mode == "new") oldSubList.updated(cardIndex, createCard)
+    else throw new IllegalArgumentException
 
   def newStash = oldCardStash.updated(playerIndex, newSubList)
   def leftCard = oldSubList(cardIndex)

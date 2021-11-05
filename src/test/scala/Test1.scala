@@ -80,24 +80,46 @@ class Test1 extends AnyWordSpec:
 
                 val openCard = createCard
                 val stash2 = createCardStash(NUMBER_OF_PLAYERS)
-                val result = change_card(CHANGED_CARD, PLAYER_INDEX, openCard, stash2)
+                val result1 = change_card(CHANGED_CARD, PLAYER_INDEX, openCard, stash2, "open")
+                val result2 = change_card(CHANGED_CARD, PLAYER_INDEX, openCard, stash2, "new")
 
-                def newStash = result._1
-                def newOpenCard = result._2
+                //other cards but selected should be the same
 
-                "selected card is replaced with open card" in {
-                    newStash(PLAYER_INDEX)(CHANGED_CARD).equals(openCard) should be(true)
+                def check_other_cards(newStash:List[List[Card]]) =
+                    (0 until NUMBER_OF_PLAYERS).foreach(player =>
+                        (0 until stash2.size).foreach(card =>
+                            if (!(player == PLAYER_INDEX && card == CHANGED_CARD))
+                                stash2(player)(card).equals(newStash(player)(card)) should be(true)
+                        )
+                    )
+
+                "replaces card with open card" when {
+                    def newStash = result1._1
+                    def newOpenCard = result1._2
+
+                    "selected card is replaced with open card" in {
+                        newStash(PLAYER_INDEX)(CHANGED_CARD).equals(openCard) should be(true)
+                    }
+
+                    "new open card is one which was dropped by replacement in last statement" in {
+                        newOpenCard.equals(stash2(PLAYER_INDEX)(CHANGED_CARD)) should be(true)
+                    }
+
+                    "other cards ecxept of selected from current player are not changed" in {
+                        check_other_cards(newStash)
+                    }
                 }
+                "replaces card with new card" when {
+                    def newStash = result2._1
+                    def newOpenCard = result2._2
 
-                "new open card is one which was dropped by replacement in last statement" in {
-                    newOpenCard.equals(stash2(PLAYER_INDEX)(CHANGED_CARD)) should be(true)
-                }
+                    "new open card is one which was dropped by replacement in last statement" in {
+                        newOpenCard.equals(stash2(PLAYER_INDEX)(CHANGED_CARD)) should be(true)
+                    }
 
-                "other cards ecxept of selected from current player are not changed" in {
-                    for (p <- 0 until NUMBER_OF_PLAYERS)
-                        for (c <- 0 until stash2.size)
-                            if (!(p == PLAYER_INDEX && c == CHANGED_CARD))
-                                stash2(p)(c).equals(newStash(p)(c)) should be(true)
+                    "other cards ecxept of selected from current player are not changed" in {
+                        check_other_cards(newStash)
+                    }
                 }
             }
             "moves cards from stash to discarded-stash" when {
