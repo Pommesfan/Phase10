@@ -57,7 +57,7 @@ def getCardsToDiscard():Option[List[Int]] =
   else
     Some(input.split(" ").map(n => n.toInt).toList)
 
-def msg = "I was compiled by Scala 3. :)"
+def msg = "I was compiled by Scala 3. :)\nSpielernamen eingeben"
 
 private def nextPlayer(currentPlayer:Int, numberOfPlayers:Int):Int = (currentPlayer + 1) % numberOfPlayers
 

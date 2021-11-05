@@ -3,7 +3,7 @@ import org.scalatest.matchers.should.Matchers._
 
 class Test1 extends AnyWordSpec:
     "A Phase 10 Card" when {
-        msg should be("I was compiled by Scala 3. :)")
+        msg should be("I was compiled by Scala 3. :)\nSpielernamen eingeben")
         "A Card " when {
             val card = Card(2, 5)
             "atrributes are correctly set" in {
