@@ -116,11 +116,5 @@ class Test1 extends AnyWordSpec:
                     newDiscardedStash(0).size should be(0)
                 }
             }
-            "make inverse index list" when {
-                val indices = List(4,5,6,7)
-                "returns indexes from 1 to 10 except of the ones just defined" in {
-                    inverseIndexList(indices, 10) should be(List(0,1,2,3,8,9))
-                }
-            }
         }
     }

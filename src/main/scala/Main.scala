@@ -1,6 +1,7 @@
 import Main.s
 import java.util.Scanner
 import scala.util.Random
+import utils.Utils
 import model.Card
 
 object Main {
@@ -80,19 +81,11 @@ private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldC
 
 private def discard_cards(current_player: Int, card_indices: List[Int], cardStash:List[List[Card]], discardedStash:List[List[Card]]): (List[List[Card]], List[List[Card]]) =
   def playerCards = cardStash(current_player)
-  def sublist_newCardstash = inverseIndexList(card_indices, cardStash(current_player).size).map(n => playerCards(n))
+  def sublist_newCardstash = Utils.inverseIndexList(card_indices, cardStash(current_player).size).map(n => playerCards(n))
   def sublist_newDiscardedCards = card_indices.map(n => playerCards(n))
   def newCardStash = cardStash.updated(current_player, sublist_newCardstash)
   def newDiscardedStash = discardedStash.updated(current_player, sublist_newDiscardedCards)
   (newCardStash, newDiscardedStash)
-
-private def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
-  var new_index_list = List[Int]()
-  (0 until maxIndex).foreach(i =>
-    if(!indexList.contains(i))
-      new_index_list = i::new_index_list
-  )
-  new_index_list.reverse
 
 val r = new Random()
 def randomColor = r.nextInt(4)
