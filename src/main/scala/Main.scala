@@ -1,4 +1,6 @@
 import Main.s
+import controller.Controller
+
 import java.util.Scanner
 import scala.util.Random
 import utils.Utils
@@ -11,10 +13,12 @@ object Main {
     println("I am cardgame Phase10!")
     println(msg)
 
+    val controller = new Controller
+
     val players = s.nextLine().split(" ")
     var current_player = 0
-    var cardStash = createCardStash(players.length)
-    var openCard = createCard
+    var cardStash = controller.createCardStash(players.length)
+    var openCard = controller.createCard
     var discardedStash = List.fill(players.size)(List[Card]())
     var player_has_discarded = Array.fill(players.size)(false)
 
@@ -22,7 +26,7 @@ object Main {
       printPlayerStatus(players(current_player), cardStash(current_player), openCard)
       val card_index = s.nextLine().toInt
       val mode = s.nextLine()
-      val result = change_card(card_index, current_player, openCard, cardStash, mode)
+      val result = controller.change_card(card_index, current_player, openCard, cardStash, mode)
       cardStash = result._1
       openCard = result._2
 
@@ -31,12 +35,12 @@ object Main {
         //apply changes if cards to discard selected
         if(discard_input.nonEmpty)
           val card_indices = discard_input.get
-          val result_discard = discard_cards(current_player, card_indices, cardStash, discardedStash)
+          val result_discard = controller.discard_cards(current_player, card_indices, cardStash, discardedStash)
           cardStash = result_discard._1
           discardedStash = result_discard._2
           player_has_discarded(current_player) = true
 
-      current_player = nextPlayer(current_player, players.length)
+      current_player = controller.nextPlayer(current_player, players.length)
 }
 
 def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : String =
@@ -61,32 +65,3 @@ def getCardsToDiscard():Option[List[Int]] =
 
 def msg = "I was compiled by Scala 3. :)\nSpielernamen eingeben"
 
-private def nextPlayer(currentPlayer:Int, numberOfPlayers:Int):Int = (currentPlayer + 1) % numberOfPlayers
-
-private def createCard: Card = Card(randomColor + 1, randomValue + 1)
-
-private def createCardStash(numberOfPlayers:Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
-
-private def change_card(cardIndex:Int, playerIndex:Int, oldOpenCard : Card, oldCardStash: List[List[Card]], mode: String): (List[List[Card]], Card) =
-  def oldSubList = oldCardStash(playerIndex)
-  def newSubList =
-    if(mode == "open") oldSubList.updated(cardIndex, oldOpenCard)
-    else if(mode == "new") oldSubList.updated(cardIndex, createCard)
-    else throw new IllegalArgumentException
-
-  def newStash = oldCardStash.updated(playerIndex, newSubList)
-  def leftCard = oldSubList(cardIndex)
-
-  (newStash, leftCard)
-
-private def discard_cards(current_player: Int, card_indices: List[Int], cardStash:List[List[Card]], discardedStash:List[List[Card]]): (List[List[Card]], List[List[Card]]) =
-  def playerCards = cardStash(current_player)
-  def sublist_newCardstash = Utils.inverseIndexList(card_indices, cardStash(current_player).size).map(n => playerCards(n))
-  def sublist_newDiscardedCards = card_indices.map(n => playerCards(n))
-  def newCardStash = cardStash.updated(current_player, sublist_newCardstash)
-  def newDiscardedStash = discardedStash.updated(current_player, sublist_newDiscardedCards)
-  (newCardStash, newDiscardedStash)
-
-val r = new Random()
-def randomColor = r.nextInt(4)
-def randomValue = r.nextInt(12)
