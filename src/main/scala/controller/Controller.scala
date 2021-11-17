@@ -2,12 +2,10 @@ package controller
 
 import model.Card
 import utils.{CardSwitchedEvent, GameStartedEvent, TurnEndedEvent, Utils, Observable}
+import Utils.{randomColor, randomValue}
 import scala.util.Random
 
 class Controller extends Observable {
-  val r = new Random()
-  def randomColor = r.nextInt(4)
-  def randomValue = r.nextInt(12)
 
   private var players = List[String]()
   private var current_player = 0

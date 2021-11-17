@@ -10,4 +10,8 @@ object Utils {
         new_index_list = i::new_index_list
     )
     new_index_list.reverse
+
+  private val r = new Random()
+  def randomColor = r.nextInt(4)
+  def randomValue = r.nextInt(12)
 }
