@@ -1,7 +1,7 @@
 package utils
 
 trait Observer:
-  def update(e:Event): Unit
+  def update(e:Event): String
 
 trait Observable:
   var subscribers: Vector[Observer] = Vector()

@@ -33,28 +33,30 @@ class TUI(controller: Controller) extends Observer {
 
     }.start()
 
-  def update(e: Event) = e match
-    case e: GameStartedEvent =>
-      println("Namen eingeben:")
-      mode = CREATE_PLAYERS
-    case e: CardSwitchedEvent =>
-      println("Abzulegende Karten angeben oder n für nicht ablegen:")
-      mode = DISCARD
-    case e: TurnEndedEvent =>
-      def currentPlayer = controller.getCurrentPlayer
-      def playerName = controller.getPlayers(currentPlayer)
-      printPlayerStatus(playerName, controller.getCardStash(currentPlayer), controller.getOpenCard)
-      mode = SWITCH
+  def update(e: Event): String =
+    val s = e match
+      case e: GameStartedEvent =>
+        mode = CREATE_PLAYERS
+        "Namen eingeben:"
+      case e: CardSwitchedEvent =>
+        mode = DISCARD
+        "Abzulegende Karten angeben oder n für nicht ablegen:"
+      case e: TurnEndedEvent =>
+        def currentPlayer = controller.getCurrentPlayer
+        def playerName = controller.getPlayers(currentPlayer)
+        mode = SWITCH
+        printPlayerStatus(playerName, controller.getCardStash(currentPlayer), controller.getOpenCard)
+    println(s)
+    s
 
   def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : String =
     val sb = new StringBuilder
     sb.append("Aktueller Spieler: " + player)
-    sb.append("\n\nOffenliegende Karte: \n")
+    sb.append("\n\nOffenliegende Karte:\n")
     sb.append(openCard)
     sb.append("\n\nKarten des Spielers:\n")
     cards.foreach(c => sb.append(c.toString + '\n'))
     sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
-    println(sb)
     sb.toString()
 
   def getCardsToDiscard(input: String):Option[List[Int]] =
