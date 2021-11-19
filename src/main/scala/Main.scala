@@ -4,7 +4,7 @@ import java.util.Scanner
 import scala.util.Random
 import utils.{GameStartedEvent, Utils}
 import model.Card
-import view.TUI
+import aview.TUI
 
 object Main {
   @main def hello: Unit =

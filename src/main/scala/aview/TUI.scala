@@ -1,4 +1,4 @@
-package view
+package aview
 
 import model.Card
 import utils.{CardSwitchedEvent, Event, GameStartedEvent, TurnEndedEvent, Observer}
