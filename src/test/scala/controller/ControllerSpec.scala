@@ -46,7 +46,6 @@ class ControllerSpec extends AnyWordSpec {
       val result2 = controller.change_card(CHANGED_CARD, PLAYER_INDEX, openCard, stash2, "new")
 
       //other cards but selected should be the same
-
       def check_other_cards(newStash:List[List[Card]]) =
         (0 until NUMBER_OF_PLAYERS).foreach(player =>
           (0 until stash2.size).foreach(card =>
@@ -97,6 +96,58 @@ class ControllerSpec extends AnyWordSpec {
         newStash(0).size should be(10)
         newDiscardedStash(1).size should be(3)
         newDiscardedStash(0).size should be(0)
+      }
+    }
+    "do-methods calls the to be wrapped methods and apply changes to Controller" when {
+      val c = new Controller
+      c.doCreatePlayers(List("Player A", "Player B"))
+      "calling doChangeCard before doDiscard triggers change of card" when {
+        val oldStash = c.getCardStash
+        val oldOpenCard = c.getOpenCard
+        val CARD_TO_CHANGE = 2
+        c.doChangeCard(CARD_TO_CHANGE, "open")
+        "applies change to controller" when {
+          c.getOpenCard should be(oldStash(0)(CARD_TO_CHANGE))
+          c.getCardStash(0)(CARD_TO_CHANGE) should be(oldOpenCard)
+        }
+        "calling doDiscard applies discarded cards to Controller" when {
+          "initially discardedStash for user should be empty and cardStash should be 10" in {
+            c.getDiscardedStash(0).size should be(0)
+            c.getCardStash(0).size should be(10)
+          }
+          "discard some cards" when {
+            c.doDiscard(Some(List(0, 1, 2)))
+            "deducted cards from stash" when {
+              "size of stash should be 7" in {
+                c.getCardStash(0).size should be(7)
+              }
+              "size of discarded stash should be 3" in {
+                c.getDiscardedStash(0).size should be(3)
+              }
+            }
+          }
+        }
+        "After last discard, switch to player 2" in {
+          c.getCurrentPlayer should be(1)
+        }
+        c.doChangeCard(5, "new")
+        "doDiscard with None-Parameter should change nothing but switch player" when {
+          c.doDiscard(None)
+          "after doDiscard with None stashes from player shouldn´t have changed" in {
+            c.getCardStash(1).size should be(10)
+            c.getDiscardedStash(1).size should be(0)
+          }
+          "after discard with also should have changed to player 1" in {
+            c.getCurrentPlayer should be(0)
+          }
+
+          "doChangeCard directly switches to next player when player has already discarded" when {
+            c.doChangeCard(0, "new")
+            "when change card in first user having just discarded, should switch direct to second player" in {
+              c.getCurrentPlayer should be(1)
+            }
+          }
+        }
       }
     }
   }
