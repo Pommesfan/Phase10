@@ -5,17 +5,19 @@ import model.Card
 
 class CardSpec extends AnyWordSpec {
   "A Card " when {
-    val card = Card(2, 5)
+    val cards_to_compare = List(Card(3, 8), Card(3, 8), Card(4, 8), Card(3, 9), Card(1, 7), Card(2, 5), Card(1, 10))
     "atrributes are correctly set" in {
-      card.color should be(2)
-      card.value should be(5)
+      cards_to_compare(5).color should be(2)
+      cards_to_compare(5).value should be(5)
     }
     "toString() is correctly implemented" in {
-      card.toString should be("Farbe: Gelb; Wert = 5")
+      cards_to_compare(5).toString should be("Farbe: Gelb; Wert = 5")
+      cards_to_compare(1).toString should be("Farbe: Blau; Wert = 8")
+      cards_to_compare(2).toString should be("Farbe: Grün; Wert = 8")
+      cards_to_compare(6).toString should be("Farbe: Rot; Wert = 10")
     }
 
     "equals() is works correct" when {
-      val cards_to_compare = List(Card(3, 8), Card(3, 8), Card(4, 8), Card(3, 9), Card(1, 7))
       "same cards return true" in {
         cards_to_compare(0).equals(cards_to_compare(1)) should be(true)
       }
