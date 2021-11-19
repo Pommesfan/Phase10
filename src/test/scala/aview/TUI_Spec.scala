@@ -28,5 +28,9 @@ class UtilsSpec extends AnyWordSpec {
       for (i <- 6 until 16)
         s(i).matches(regexCard) should be(true)
     }
+    "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
+      tui.getCardsToDiscard("n") should be(None)
+      tui.getCardsToDiscard("9 3 6 5 7 4") should be(Some(List(9, 3, 6, 5, 7, 4)))
+    }
   }
 }
