@@ -26,7 +26,7 @@ class UtilsSpec extends AnyWordSpec {
       s(4) should be("")
       s(5)  should be("Karten des Spielers:")
       for (i <- 6 until 16)
-        s(i).matches(regexCard) should be(true)
+        s(i).matches((i - 6).toString + ": " + regexCard) should be(true)
     }
     "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
       tui.getCardsToDiscard("n") should be(None)

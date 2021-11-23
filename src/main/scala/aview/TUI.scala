@@ -55,7 +55,7 @@ class TUI(controller: Controller) extends Observer {
     sb.append("\n\nOffenliegende Karte:\n")
     sb.append(openCard)
     sb.append("\n\nKarten des Spielers:\n")
-    cards.foreach(c => sb.append(c.toString + '\n'))
+    cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
     sb.toString()
 
