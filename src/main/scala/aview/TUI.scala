@@ -1,7 +1,7 @@
 package aview
 
 import model.Card
-import utils.{CardSwitchedEvent, Event, GameStartedEvent, TurnEndedEvent, Observer}
+import utils.{CardSwitchedEvent, OutputEvent, GameStartedEvent, TurnEndedEvent, Observer}
 import controller.Controller
 
 import java.util.Scanner
@@ -33,7 +33,7 @@ class TUI(controller: Controller) extends Observer {
 
     }.start()
 
-  def update(e: Event): String =
+  def update(e: OutputEvent): String =
     val s = e match
       case e: GameStartedEvent =>
         mode = CREATE_PLAYERS
