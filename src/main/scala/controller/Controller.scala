@@ -13,6 +13,8 @@ class Controller extends Observable {
   private var openCard: Card = createCard
   private var discardedStash = List[List[Card]]()
   private var player_has_discarded = List[Boolean]()
+  private var phases = List[Int]()
+  private var validators = List[ValidatorStrategy]()
 
   def getPlayers = players
   def getCurrentPlayer = current_player
@@ -52,6 +54,8 @@ class Controller extends Observable {
     cardStash = createCardStash(numberOfPlayers)
     discardedStash = List.fill(numberOfPlayers)(List[Card]())
     player_has_discarded = List.fill(numberOfPlayers)(false)
+    phases = List.fill(numberOfPlayers)(1)
+    validators = List.fill(numberOfPlayers)(Validator.getValidator(1))
     notifyObservers(new TurnEndedEvent)
 
   def doChangeCard(index: Int, mode: String) =
@@ -65,7 +69,7 @@ class Controller extends Observable {
       notifyObservers(new CardSwitchedEvent)
 
   def doDiscard(indices: Option[List[Int]]) =
-    if (indices.nonEmpty)
+    if (indices.nonEmpty && validators(current_player).validate(cardStash(current_player), indices.get))
       val list = indices.get
       val res = discard_cards(current_player, list, cardStash, discardedStash)
       cardStash = res._1
