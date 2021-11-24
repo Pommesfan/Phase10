@@ -1,13 +1,13 @@
 package aview
-import controller.Controller
+import controller.{Controller, GameRunningControllerState}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import utils.{CardSwitchedEvent, GameStartedEvent, TurnEndedEvent}
+import utils.{CardSwitchedEvent, DoCreatePlayersEvent, GameStartedEvent, TurnEndedEvent}
 
 class UtilsSpec extends AnyWordSpec {
   "A TUI" when {
     val c = new Controller
-    c.doCreatePlayers(List("Player A", "Player B"))
+    val initialState = c.solve(new DoCreatePlayersEvent(List("Player A", "Player B")))
     val tui = new TUI(c)
     "Asking for player name after programm started" in {
       tui.update(new GameStartedEvent) should be("Namen eingeben:")
@@ -19,7 +19,8 @@ class UtilsSpec extends AnyWordSpec {
       val regexCard = "Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))"
       val s1 = tui.update(new TurnEndedEvent)
       val s = s1.split("\n")
-      s(0) should be("Aktueller Spieler: " + c.getPlayers(c.getCurrentPlayer))
+      def initialState2 = initialState.asInstanceOf[GameRunningControllerState]
+      s(0) should be("Aktueller Spieler: " + initialState2.players(initialState2.currentPlayer))
       s(1) should be("")
       s(2) should be("Offenliegende Karte:")
       s(3).matches(regexCard) should be(true)
