@@ -17,7 +17,7 @@ private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 
 abstract class ValidatorStrategy(val numberOfPhase:Int):
   protected val cardGroups: List[CardGroup]
-  def description():String
+  def description:String
   def getNumberOfPhase(): Int = numberOfPhase
   def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
   def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean =
@@ -40,12 +40,11 @@ abstract class ValidatorStrategy(val numberOfPhase:Int):
     }
     true
 
-private class Phase1Validator extends ValidatorStrategy(1) {
+private class Phase1Validator extends ValidatorStrategy(1):
   override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.MULTIPLES, 3))
-  override def description(): String = "Zwei Drillinge"
-}
+  override def description: String = "Zwei Drillinge"
 
-private class Phase2Validator extends ValidatorStrategy(2) {
+
+private class Phase2Validator extends ValidatorStrategy(2):
   override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.SEQUENCE, 4))
-  override def description(): String = "Drilling und Viererfolge"
-}
+  override def description: String = "Drilling und Viererfolge"

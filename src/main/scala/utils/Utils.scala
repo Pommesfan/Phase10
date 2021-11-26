@@ -4,6 +4,9 @@ import scala.util.Random
 import model.Card
 
 object Utils {
+  val NEW_CARD = 1
+  val OPENCARD = 2
+  
   private val r = new Random()
   def randomColor = r.nextInt(4)
   def randomValue = r.nextInt(12)

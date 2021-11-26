@@ -4,6 +4,8 @@ import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import model.{Card, RoundData, TurnData}
 import utils.{DoCreatePlayersEvent, DoSwitchCardEvent, TurnEndedEvent}
+import utils.Utils
+import Utils.{NEW_CARD, OPENCARD}
 
 class ControllerSpec extends AnyWordSpec {
   "A Controller" when {
@@ -32,7 +34,7 @@ class ControllerSpec extends AnyWordSpec {
       "switching with new card" when {
         val c = new Controller
         val state1 = c.solve(new DoCreatePlayersEvent(List("PlayerA", "PlayerB"))).asInstanceOf[GameRunningControllerState]
-        val state2 = c.solve(new DoSwitchCardEvent(4, "new")).asInstanceOf[GameRunningControllerState]
+        val state2 = c.solve(new DoSwitchCardEvent(4, NEW_CARD)).asInstanceOf[GameRunningControllerState]
         "open card is the new from index" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))
         }
@@ -40,7 +42,7 @@ class ControllerSpec extends AnyWordSpec {
       "switching with open card" when {
         val c = new Controller
         val state1 = c.solve(new DoCreatePlayersEvent(List("PlayerA", "PlayerB"))).asInstanceOf[GameRunningControllerState]
-        val state2 = c.solve(new DoSwitchCardEvent(4, "open")).asInstanceOf[GameRunningControllerState]
+        val state2 = c.solve(new DoSwitchCardEvent(4, OPENCARD)).asInstanceOf[GameRunningControllerState]
         "indexed and open card are switched" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))
           state2.t.cardStash(0)(4) should be(state1.t.openCard)
@@ -59,7 +61,7 @@ class ControllerSpec extends AnyWordSpec {
           )
         )
 
-        val state2 = state1.switchCards(8, "new", new Controller)._1
+        val state2 = state1.switchCards(8, NEW_CARD, new Controller)._1
 
         "at next asks next user to switch cards" in {
           state2.isInstanceOf[SwitchCardControllerState] should be(true)

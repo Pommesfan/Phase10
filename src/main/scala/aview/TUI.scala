@@ -3,6 +3,7 @@ package aview
 import model.Card
 import utils.{CardSwitchedEvent, DoCreatePlayersEvent, DoDiscardEvent, DoSwitchCardEvent, GameStartedEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
 import controller.{Controller, GameRunningControllerState}
+import Utils.{NEW_CARD, OPENCARD}
 
 import java.util.Scanner
 
@@ -26,7 +27,12 @@ class TUI(controller: Controller) extends Observer {
             case CREATE_PLAYERS => controller.solve(new DoCreatePlayersEvent(input.split(" ").toList))
             case SWITCH => {
               val inputs = input.split(" ").toList
-              controller.solve(new DoSwitchCardEvent(inputs(0).toInt, inputs(1)))
+              def index = inputs(0)
+              def mode = inputs(1) match {
+                case "new" => NEW_CARD
+                case "open" => OPENCARD
+              }
+              controller.solve(new DoSwitchCardEvent(inputs(0).toInt, mode))
             }
             case DISCARD =>
               controller.solve(new DoDiscardEvent(getCardsToDiscard(input)))
