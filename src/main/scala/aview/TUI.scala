@@ -1,8 +1,8 @@
 package aview
 
 import model.Card
-import utils.{CardSwitchedEvent, Event, GameStartedEvent, TurnEndedEvent, Observer}
-import controller.Controller
+import utils.{CardSwitchedEvent, DoCreatePlayersEvent, DoDiscardEvent, DoSwitchCardEvent, GameStartedEvent, Observer, OutputEvent, TurnEndedEvent}
+import controller.{Controller, GameRunningControllerState}
 
 import java.util.Scanner
 
@@ -23,29 +23,34 @@ class TUI(controller: Controller) extends Observer {
 
           val input = sc.nextLine()
           mode match
-            case CREATE_PLAYERS => controller.doCreatePlayers(input.split(" ").toList)
+            case CREATE_PLAYERS => controller.solve(new DoCreatePlayersEvent(input.split(" ").toList))
             case SWITCH => {
               val inputs = input.split(" ").toList
-              controller.doChangeCard(inputs(0).toInt, inputs(1))
+              controller.solve(new DoSwitchCardEvent(inputs(0).toInt, inputs(1)))
             }
             case DISCARD =>
-              controller.doDiscard(getCardsToDiscard(input))
+              controller.solve(new DoDiscardEvent(getCardsToDiscard(input)))
 
     }.start()
 
-  def update(e: Event): String =
+  def update(e: OutputEvent): String =
     val s = e match
       case e: GameStartedEvent =>
         mode = CREATE_PLAYERS
         "Namen eingeben:"
-      case e: CardSwitchedEvent =>
-        mode = DISCARD
-        "Abzulegende Karten angeben oder n für nicht ablegen:"
-      case e: TurnEndedEvent =>
-        def currentPlayer = controller.getCurrentPlayer
-        def playerName = controller.getPlayers(currentPlayer)
-        mode = SWITCH
-        printPlayerStatus(playerName, controller.getCardStash(currentPlayer), controller.getOpenCard)
+      case e: OutputEvent =>
+        val g = controller.getGameData
+        val r = g._1
+        val t = g._2
+        e match
+          case e: CardSwitchedEvent =>
+            mode = DISCARD
+            "Abzulegende Karten angeben oder n für nicht ablegen:"
+          case e: TurnEndedEvent =>
+            def currentPlayer = t.current_player
+            def playerName = controller.getPlayers()
+            mode = SWITCH
+            printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard)
     println(s)
     s
 
@@ -55,7 +60,7 @@ class TUI(controller: Controller) extends Observer {
     sb.append("\n\nOffenliegende Karte:\n")
     sb.append(openCard)
     sb.append("\n\nKarten des Spielers:\n")
-    cards.foreach(c => sb.append(c.toString + '\n'))
+    cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
     sb.toString()
 
