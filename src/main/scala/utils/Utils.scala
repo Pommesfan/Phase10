@@ -9,12 +9,7 @@ object Utils {
   def randomValue = r.nextInt(12)
 
   def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
-    var new_index_list = List[Int]()
-    (0 until maxIndex).foreach(i =>
-      if(!indexList.contains(i))
-        new_index_list = i::new_index_list
-    )
-    new_index_list.reverse
+    List.range(0, 10).partition(n => !indexList.contains(n))._1
 
   def indexesUnique(l:List[Int]): Boolean = {
     val sorted = l.sortWith((a,b) => a < b)

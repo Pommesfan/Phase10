@@ -5,6 +5,17 @@ import model.Card
 
 class ValidatorSpec extends AnyWordSpec {
   "A Validator" when {
+    "creates a Validator" when {
+      val v = Validator.getValidator(1)
+      "should have returned a ValidatorStrategy" when {
+        val inputs = v.getNumberOfInputs()
+        "Has set up a validator for phase 1" in {
+          inputs.size should be(2)
+          inputs(0) should be(3)
+          inputs(1) should be(3)
+        }
+      }
+    }
     def indices(numberOfCards: Int) = (0 until numberOfCards).toList
 
     "validates phase 1" when {
