@@ -9,6 +9,7 @@ class Controller extends Observable:
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
   def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
+  def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
 
   private var state:ControllerState = new InitialState
   
