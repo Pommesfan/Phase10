@@ -20,11 +20,9 @@ abstract class ValidatorStrategy(val numberOfPhase:Int):
   def description():String
   def getNumberOfPhase(): Int = numberOfPhase
   def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
-  def validate(cards: List[Card], selectedCardIndexesFlat:List[Int]): Boolean =
+  def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean =
     //no cards-index selected multiple
-    if(!Utils.indexesUnique(selectedCardIndexesFlat)) return false
-
-    val selectedCardIndexes = Utils.groupCardIndexes(selectedCardIndexesFlat, getNumberOfInputs())
+    if(!Utils.indexesUnique(selectedCardIndexes.flatten)) return false
 
     val card_stashes = selectedCardIndexes.map(l => l.map(n => cards(n)))
     val group_types = cardGroups.map(cg => cg.groupType)

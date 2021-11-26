@@ -48,11 +48,8 @@ object Utils {
     true
   }
 
-  def groupCardIndexes(indices:List[Int], numberOfInputs:List[Int]):List[List[Int]] =
-    var start = 0
-    var list = List[List[Int]]()
-    for(i <- numberOfInputs)
-      list = list :+ indices.slice(start, start + i)
-      start = i
-    list
+  def makeGroupedIndexList(indices:String, numberOfInputs:List[Int]):List[List[Int]] =
+    indices.split(";").toList.map { s =>
+      s.trim.split(" ").map(n => n.toInt).toList
+    }
 }

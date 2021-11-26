@@ -42,7 +42,7 @@ class InitialState extends ControllerState:
         0,
         c.createCardStash(numberOfPlayers),
         c.createCard,
-        List.fill(numberOfPlayers)(None:Option[List[Card]]),
+        List.fill(numberOfPlayers)(None:Option[List[List[Card]]]),
         List.fill(numberOfPlayers)(false))),
       new TurnEndedEvent)
 
@@ -69,13 +69,13 @@ class SwitchCardControllerState(players: List[String], r:RoundData, t:TurnData) 
 
 
 class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
-  def discardCards(indices: Option[List[Int]], c:Controller): (GameRunningControllerState, OutputEvent) =
+  def discardCards(indices: Option[List[List[Int]]], c:Controller): (GameRunningControllerState, OutputEvent) =
       def newTurnData =
         if (indices.nonEmpty && r.validators(currentPlayer).validate(t.cardStash(currentPlayer), indices.get))
           def cardIndices = indices.get
           def playerCards = t.cardStash(currentPlayer)
-          def sublist_newCardstash = Utils.inverseIndexList(cardIndices, t.cardStash(currentPlayer).size).map(n => playerCards(n))
-          def sublist_newDiscardedCards = cardIndices.map(n => t.cardStash(currentPlayer)(n))
+          def sublist_newCardstash = Utils.inverseIndexList(cardIndices.flatten, t.cardStash(currentPlayer).size).map(n => playerCards(n))
+          def sublist_newDiscardedCards = cardIndices.map(n => n.map(n2 => t.cardStash(currentPlayer)(n2)))
           def newCardStash = t.cardStash.updated(currentPlayer, sublist_newCardstash)
           def newDiscardedStash = t.discardedStash.updated(currentPlayer, Some(sublist_newDiscardedCards))
           new TurnData(c.nextPlayer(currentPlayer, players.size), newCardStash, t.openCard, newDiscardedStash, t.player_has_discarded.updated(currentPlayer, true))

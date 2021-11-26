@@ -1,7 +1,7 @@
 package aview
 
 import model.Card
-import utils.{CardSwitchedEvent, DoCreatePlayersEvent, DoDiscardEvent, DoSwitchCardEvent, GameStartedEvent, Observer, OutputEvent, TurnEndedEvent}
+import utils.{CardSwitchedEvent, DoCreatePlayersEvent, DoDiscardEvent, DoSwitchCardEvent, GameStartedEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
 import controller.{Controller, GameRunningControllerState}
 
 import java.util.Scanner
@@ -64,9 +64,13 @@ class TUI(controller: Controller) extends Observer {
     sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
     sb.toString()
 
-  def getCardsToDiscard(input: String):Option[List[Int]] =
+  def getCardsToDiscard(input: String):Option[List[List[Int]]] =
     if(input == "n")
       None
     else
-      Some(input.split(" ").map(n => n.toInt).toList)
+      val g = controller.getGameData
+      def r = g._1
+      def t = g._2
+      def numberOfInputs = r.validators(t.current_player).getNumberOfInputs()
+      Some(Utils.makeGroupedIndexList(input, numberOfInputs))
 }

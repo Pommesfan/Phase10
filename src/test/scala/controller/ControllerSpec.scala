@@ -68,6 +68,7 @@ class ControllerSpec extends AnyWordSpec {
       }
 
       "discard cards" when {
+        val indices = List(List(0,1,2), List(3,4,5))
         def createState(cardStash:List[List[Card]]) = new DiscardControllerState(
           List("AA", "BB"), RoundData(List.fill(2)(Validator.getValidator(1))),
           new TurnData(
@@ -84,14 +85,16 @@ class ControllerSpec extends AnyWordSpec {
             List(Card(1,11),Card(4,7),Card(1,11),Card(4,9),Card(2,8),Card(2,5),Card(4,2),Card(1,5),Card(2,3),Card(2,1))
           ))
 
-          val state2 = state1.discardCards(Some(List(0,1,2,3,4,5)), new Controller)._1.asInstanceOf[SwitchCardControllerState]
+          val state2 = state1.discardCards(Some(indices), new Controller)._1.asInstanceOf[SwitchCardControllerState]
 
           "cards should have been deducted from stash" in {
             state2.t.cardStash(0).size should be(4)
           }
           "deducted cards should have been added to discardedStash" in {
             state2.t.discardedStash(0).isEmpty should be(false)
-            state2.t.discardedStash(0).get.size should be(6)
+            state2.t.discardedStash(0).get.size should be(2)
+            state2.t.discardedStash(0).get(0).size should be(3)
+            state2.t.discardedStash(0).get(1).size should be(3)
           }
           "have switched to second player" in {
             state2.t.current_player should be(1)
@@ -103,7 +106,7 @@ class ControllerSpec extends AnyWordSpec {
             List(Card(1,11),Card(4,7),Card(1,11),Card(4,9),Card(2,8),Card(2,5),Card(4,2),Card(1,5),Card(2,3),Card(2,1))
           ))
 
-          val state2 = state1.discardCards(Some(List(0,1,2,3,4,5)), new Controller)._1.asInstanceOf[SwitchCardControllerState]
+          val state2 = state1.discardCards(Some(indices), new Controller)._1.asInstanceOf[SwitchCardControllerState]
           "cardstash should be the same size" in {
             state2.t.cardStash(0).size should be(10)
           }

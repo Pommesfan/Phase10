@@ -31,7 +31,7 @@ class UtilsSpec extends AnyWordSpec {
     }
     "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
       tui.getCardsToDiscard("n") should be(None)
-      tui.getCardsToDiscard("9 3 6 5 7 4") should be(Some(List(9, 3, 6, 5, 7, 4)))
+      tui.getCardsToDiscard("9 3 6 ; 5 7 4") should be(Some(List(List(9, 3, 6), List(5, 7, 4))))
     }
   }
 }
