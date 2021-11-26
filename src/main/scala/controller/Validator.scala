@@ -1,35 +1,26 @@
 package controller
 
 import utils.Utils
-import Utils.{MULTIPLES, SAME_COLOR, SEQUENCE}
 import model.Card
+
+object GroupType extends Enumeration:
+  val MULTIPLES, SAME_COLOR, SEQUENCE = Value
 
 object Validator {
   def getValidator(index : Int): ValidatorStrategy = index match {
-    case 1 => new PhaseValidator(1) {
-      override protected val cardGroups: List[CardGroup] = List(new CardGroup(MULTIPLES, 3), new CardGroup(MULTIPLES, 3))
-      override def description(): String = "Zwei Drillinge"
-    }
-    case 2 => new PhaseValidator(2) {
-      override protected val cardGroups: List[CardGroup] = List(new CardGroup(MULTIPLES, 3), new CardGroup(SEQUENCE, 4))
-      override def description(): String = "Drilling und Viererfolge"
-    }
+    case 1 => new Phase1Validator
+    case 2 => new Phase2Validator
   }
 }
 
-trait ValidatorStrategy:
-  def description() : String
-  def validate(cards:List[Card], numbers:List[Int]) : Boolean
-  def getNumberOfInputs() : List[Int]
-  def getNumberOfPhase() : Int
+private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 
-private class CardGroup(val groupType:Int, val numberOfCards:Int)
-
-private abstract class PhaseValidator(val numberOfPhase:Int) extends ValidatorStrategy:
+abstract class ValidatorStrategy(val numberOfPhase:Int):
   protected val cardGroups: List[CardGroup]
-  override def getNumberOfPhase(): Int = numberOfPhase
-  override def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
-  override def validate(cards: List[Card], selectedCardIndexesFlat:List[Int]): Boolean =
+  def description():String
+  def getNumberOfPhase(): Int = numberOfPhase
+  def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
+  def validate(cards: List[Card], selectedCardIndexesFlat:List[Int]): Boolean =
     //no cards-index selected multiple
     if(!Utils.indexesUnique(selectedCardIndexesFlat)) return false
 
@@ -43,10 +34,20 @@ private abstract class PhaseValidator(val numberOfPhase:Int) extends ValidatorSt
 
       def enoughCards = subList.size == number_of_cards
       def validateCardGroup: Boolean = group_types(idx) match
-        case SEQUENCE => Utils.resolveSequence(subList)
-        case MULTIPLES => Utils.resolveMultiples(subList)
-        case SAME_COLOR => Utils.resolveSameColor(subList)
+        case GroupType.SEQUENCE => Utils.resolveSequence(subList)
+        case GroupType.MULTIPLES => Utils.resolveMultiples(subList)
+        case GroupType.SAME_COLOR => Utils.resolveSameColor(subList)
 
       if (!(enoughCards && validateCardGroup)) return false
     }
     true
+
+private class Phase1Validator extends ValidatorStrategy(1) {
+  override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.MULTIPLES, 3))
+  override def description(): String = "Zwei Drillinge"
+}
+
+private class Phase2Validator extends ValidatorStrategy(2) {
+  override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.SEQUENCE, 4))
+  override def description(): String = "Drilling und Viererfolge"
+}
