@@ -2,6 +2,8 @@ package controller
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers._
 import model.Card
+import utils.Utils
+import Utils.{INJECT_TO_FRONT, INJECT_AFTER}
 
 class ValidatorSpec extends AnyWordSpec {
   "A Validator" when {
@@ -132,6 +134,33 @@ class ValidatorSpec extends AnyWordSpec {
       }
       "validate phase 10 with unsuitable cards" in {
         v.validate(cards2, indices(List(5,3))) should be(false)
+      }
+    }
+    "validate to inject card to another player in" when {
+      val v = Validator.getValidator(2)
+      "validate append to multiples" when {
+        val cards = List(Card(1,12),Card(4,12),Card(2,12))
+        //stash 0 is multiple
+        "can append suitabe cards" in {
+          v.canAppend(cards, Card(2, 12), 0, INJECT_TO_FRONT) should be(true)
+          v.canAppend(cards, Card(1, 12), 0, INJECT_AFTER) should be(true)
+        }
+        "validates unsuitable cards not toi be appended" in {
+          v.canAppend(cards, Card(2, 8), 0, INJECT_TO_FRONT) should be(false)
+          v.canAppend(cards, Card(4, 3), 0, INJECT_AFTER) should be(false)
+        }
+      }
+      "validate append to sequence" when {
+        val cards = List(Card(4,9),Card(2,10),Card(4,11))
+        //stash 1 is sequence
+        "can append suitabe cards" in {
+          v.canAppend(cards, Card(1, 8), 1, INJECT_TO_FRONT) should be(true)
+          v.canAppend(cards, Card(4, 12), 1, INJECT_AFTER) should be(true)
+        }
+        "validates unsuitable cards not toi be appended" in {
+          v.canAppend(cards, Card(3, 7), 1, INJECT_TO_FRONT) should be(false)
+          v.canAppend(cards, Card(4, 3), 1, INJECT_AFTER) should be(false)
+        }
       }
     }
   }

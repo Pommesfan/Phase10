@@ -26,6 +26,7 @@ private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 abstract class ValidatorStrategy(val numberOfPhase:Int):
   protected val cardGroups: List[CardGroup]
   def description:String
+  def group_types = cardGroups.map(cg => cg.groupType)
   def getNumberOfPhase(): Int = numberOfPhase
   def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
   def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean =
@@ -33,7 +34,6 @@ abstract class ValidatorStrategy(val numberOfPhase:Int):
     if(!Utils.indexesUnique(selectedCardIndexes.flatten)) return false
 
     val card_stashes = selectedCardIndexes.map(l => l.map(n => cards(n)))
-    val group_types = cardGroups.map(cg => cg.groupType)
     cardGroups.indices.foreach {idx =>
       def subList = card_stashes(idx)
       def number_of_cards = cardGroups(idx).numberOfCards
@@ -47,6 +47,12 @@ abstract class ValidatorStrategy(val numberOfPhase:Int):
       if (!(enoughCards && validateCardGroup)) return false
     }
     true
+    
+  def canAppend(cards:List[Card], cardToInject:Card, stashIndex:Int, position:Int): Boolean =
+    group_types(stashIndex) match
+      case GroupType.SEQUENCE => Utils.fitToSequence(cards, cardToInject, position)
+      case GroupType.MULTIPLES => cards.head.value == cardToInject.value
+      case GroupType.SAME_COLOR => cards.head.color == cardToInject.color
 
 private class Phase1Validator extends ValidatorStrategy(1):
   override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.MULTIPLES, 3))
