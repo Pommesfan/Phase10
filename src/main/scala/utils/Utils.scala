@@ -4,6 +4,11 @@ import scala.util.Random
 import model.Card
 
 object Utils {
+  val INJECT_TO_FRONT = 1
+  val INJECT_AFTER = 2
+  val NEW_CARD = 1
+  val OPENCARD = 2
+
   private val r = new Random()
   def randomColor = r.nextInt(4)
   def randomValue = r.nextInt(12)
@@ -48,11 +53,17 @@ object Utils {
     true
   }
 
-  def groupCardIndexes(indices:List[Int], numberOfInputs:List[Int]):List[List[Int]] =
-    var start = 0
-    var list = List[List[Int]]()
-    for(i <- numberOfInputs)
-      list = list :+ indices.slice(start, start + i)
-      start = i
-    list
+  def makeGroupedIndexList(indices:String, numberOfInputs:List[Int]):List[List[Int]] =
+    indices.split(":").toList.map { s =>
+      s.trim.split(" ").map(n => n.toInt).toList
+    }
+
+  def fitToSequence(cards: List[Card], cardToInject:Card, position: Int):Boolean =
+    def isInSequence(a:Int, b:Int) = a == 12 && b == 1 || b - a == 1
+    if(position == INJECT_TO_FRONT)
+      isInSequence(cardToInject.value, cards.head.value)
+    else if(position == INJECT_AFTER)
+      isInSequence(cards.last.value, cardToInject.value)
+    else
+      throw new IllegalArgumentException
 }
