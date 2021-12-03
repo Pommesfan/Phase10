@@ -62,18 +62,21 @@ class TUI(controller: Controller) extends Observer {
         val g = controller.getGameData
         val r = g._1
         val t = g._2
+        def currentPlayer = t.current_player
+        val playerName = controller.getPlayers()
         e match
           case e: GoToInjectEvent =>
             mode = INJECT
-            "Karten ablegen? Angabe: Spieler, Karte, Stapel, Position (FRONT/AFTER)"
+            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+              "\nKarten anlegen? Angabe: Spieler, Karte, Stapel, Position (FRONT/AFTER)"
           case e: GoToDiscardEvent =>
             mode = DISCARD
-            "Abzulegende Karten angeben oder n für nicht ablegen:"
+            printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+              "\nAbzulegende Karten angeben oder n für nicht ablegen:"
           case e: TurnEndedEvent =>
-            def currentPlayer = t.current_player
-            def playerName = controller.getPlayers()
             mode = SWITCH
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard)
+            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard) +
+              "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
     println(s)
     s
 
@@ -84,7 +87,6 @@ class TUI(controller: Controller) extends Observer {
     sb.append(openCard)
     sb.append("\n\nKarten des Spielers:\n")
     cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
-    sb.append("\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)")
     sb.toString()
 
   def printDiscardedCards(playerNames:List[String], discardedCards:List[Option[List[List[Card]]]]): String =
