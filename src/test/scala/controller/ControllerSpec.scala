@@ -60,8 +60,7 @@ class ControllerSpec extends AnyWordSpec {
             0,
             cardStash,
             Card(2,9),
-            List.fill(2)(None),
-            List.fill(2)(false)
+            List.fill(2)(None)
           )
         )
         "discard suitable cards successfull" when {
@@ -129,7 +128,7 @@ class ControllerSpec extends AnyWordSpec {
     "Inject card to player itself or another if he has already discarded and cards fit to discardedStash" when {
       def createState(cardStash:List[List[Card]], discardedStash:List[Option[List[List[Card]]]], currentPlayer:Int) = new InjectState(
         List("PlayerA", "PlayerB"), new RoundData(List.fill(2)(Validator.getValidator(1))),
-        new TurnData(currentPlayer, cardStash, Card(2,5), discardedStash, List(true, false))
+        new TurnData(currentPlayer, cardStash, Card(2,5), discardedStash)
       )
 
       "process without discarding None" when {
@@ -152,7 +151,6 @@ class ControllerSpec extends AnyWordSpec {
           t1.cardStash should be(t2.cardStash)
           t1.openCard should be(t2.openCard)
           t1.discardedStash should be(t2.discardedStash)
-          t1.player_has_discarded should be(t2.player_has_discarded)
         }
       }
       "process with fitting card" when {

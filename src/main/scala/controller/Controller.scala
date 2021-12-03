@@ -7,17 +7,16 @@ import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, ra
 import scala.util.Random
 
 class Controller extends Observable:
-  val undoManager = new UndoManager
+  private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
-  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(createCheat)
+  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
   def createInitialTurnData(numberOfPlayers:Int) = new TurnData(
     0,
     createCardStash(numberOfPlayers),
     createCard,
-    List.fill(numberOfPlayers)(None:Option[List[List[Card]]]),
-    List.fill(numberOfPlayers)(false))
+    List.fill(numberOfPlayers)(None:Option[List[List[Card]]]))
 
   def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
   
@@ -68,16 +67,16 @@ class SwitchCardControllerState(players: List[String], r:RoundData, t:TurnData) 
 
     def newStash = t.cardStash.updated(currentPlayer, newPlayerCardStash)
 
-    if(t.player_has_discarded(currentPlayer))
-      def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash, t.player_has_discarded)
+    if(t.discardedStash(currentPlayer).nonEmpty)
+      def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash)
       (new InjectState(players, r, newTurnData), new GoToInjectEvent)
     else
-      def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash, t.player_has_discarded)
+      def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash)
       (new DiscardControllerState(players, r, newTurnData), new GoToDiscardEvent)
 
 
 class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
-  private def nextPlayerOnly(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash, t.player_has_discarded)
+  private def nextPlayerOnly(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
   def discardCards(cardIndices: List[List[Int]], c:Controller): (GameRunningControllerState, OutputEvent) =
       def newTurnData =
         if (r.validators(currentPlayer).validate(t.cardStash(currentPlayer), cardIndices))
@@ -86,7 +85,7 @@ class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) ext
           def sublist_newDiscardedCards = cardIndices.map(n => n.map(n2 => t.cardStash(currentPlayer)(n2)))
           def newCardStash = t.cardStash.updated(currentPlayer, sublist_newCardstash)
           def newDiscardedStash = t.discardedStash.updated(currentPlayer, Some(sublist_newDiscardedCards))
-          new TurnData(c.nextPlayer(currentPlayer, players.size), newCardStash, t.openCard, newDiscardedStash, t.player_has_discarded.updated(currentPlayer, true))
+          new TurnData(c.nextPlayer(currentPlayer, players.size), newCardStash, t.openCard, newDiscardedStash)
         else
           nextPlayerOnly(c)
       (new SwitchCardControllerState(players, r, newTurnData), new TurnEndedEvent)
@@ -94,33 +93,33 @@ class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) ext
   def skipDiscard(c:Controller) = (new SwitchCardControllerState(players, r, nextPlayerOnly(c)), new TurnEndedEvent)
 
 class InjectState (players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
-  private def newTurnDataNextPlayer(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash, t.player_has_discarded)
+  private def newTurnDataNextPlayer(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
   def injectCard(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, c:Controller): (GameRunningControllerState, OutputEvent) =
       def targetStash = t.discardedStash(receiving_player).get
       def discardedSubStash = targetStash(stashIndex)
 
       def cardToInject = t.cardStash(currentPlayer)(cardIndex)
 
-      def canAppend = (t.player_has_discarded(receiving_player) &&
+      def canAppend = (t.discardedStash(receiving_player).nonEmpty &&
         r.validators(receiving_player).canAppend(discardedSubStash, cardToInject, stashIndex, position))
 
-      if(!canAppend)
+      if(canAppend)
+        def newSublistCardStash = t.cardStash(currentPlayer).drop(cardIndex)
+        def newCardStash = t.cardStash.updated(currentPlayer, newSublistCardStash)
+
+        def newDiscardedStashSublist =
+          if (position == INJECT_TO_FRONT)
+            cardToInject :: discardedSubStash
+          else if (position == INJECT_AFTER)
+            (cardToInject :: (discardedSubStash).reverse).reverse
+          else
+            throw new IllegalArgumentException
+
+        def newDiscardedStash = t.discardedStash.updated(receiving_player, Some(targetStash.updated(stashIndex, newDiscardedStashSublist)))
+
+        def newTurnData = new TurnData(t.current_player, newCardStash, t.openCard, newDiscardedStash)
+        (new InjectState(players, r, newTurnData), new GoToInjectEvent)
+      else
         return (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c)), new TurnEndedEvent)
-
-      def newSublistCardStash = t.cardStash(currentPlayer).drop(cardIndex)
-      def newCardStash = t.cardStash.updated(currentPlayer, newSublistCardStash)
-
-      def newDiscardedStashSublist =
-        if (position == INJECT_TO_FRONT)
-          cardToInject :: discardedSubStash
-        else if (position == INJECT_AFTER)
-          (cardToInject :: (discardedSubStash).reverse).reverse
-        else
-          throw new IllegalArgumentException
-
-      def newDiscardedStash = t.discardedStash.updated(receiving_player, Some(targetStash.updated(stashIndex, newDiscardedStashSublist)))
-
-      def newTurnData = new TurnData(t.current_player, newCardStash, t.openCard, newDiscardedStash, t.player_has_discarded)
-      return (new InjectState(players, r, newTurnData), new GoToInjectEvent)
       
   def skipInject(c:Controller) = (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c)), new TurnEndedEvent)

@@ -2,10 +2,11 @@ package aview
 
 import model.Card
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
-import controller.{Controller, Command, CreatePlayerCommand, DiscardCommand, ControllerState, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import controller.{Command, Controller, ControllerState, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
 import java.util.Scanner
+import scala.util.{Failure, Success, Try}
 
 class TUI(controller: Controller) extends Observer {
   val CREATE_PLAYERS = 1
@@ -26,7 +27,11 @@ class TUI(controller: Controller) extends Observer {
           if(input == "undo")
             controller.undo
           else
-            controller.solve(createCommand(input, controller.state))
+            val command_try = Try(createCommand(input, controller.state))
+            command_try match {
+              case Success(command) => controller.solve(command)
+              case Failure(command) => println("Eingaben ungültig")
+            }
     }.start()
 
   def createCommand(input:String, state:ControllerState):Command = mode match
