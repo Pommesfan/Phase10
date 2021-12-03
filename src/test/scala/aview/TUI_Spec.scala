@@ -7,7 +7,7 @@ import utils.{GameStartedEvent, GoToDiscardEvent, TurnEndedEvent}
 class TUI_Spec extends AnyWordSpec {
   "A TUI" when {
     val c = new Controller
-    val initialState = c.solve(new CreatePlayerCommand(List("Player A", "Player B"), c.state))
+    val initialState = c.solve(new CreatePlayerCommand(List("Player A", "Player B"), c.getState))
     val tui = new TUI(c)
     val regexCard = "Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))"
     "Asking for player name after programm started" in {

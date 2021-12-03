@@ -13,7 +13,7 @@ class ControllerSpec extends AnyWordSpec {
   "A Controller" when {
     "starts game with selected players" when {
       val c = new Controller
-      val s = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.state))
+      val s = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState))
       "should return an SwitchCardControllerState" in {
         s.isInstanceOf[SwitchCardControllerState] should be(true)
       }
@@ -35,7 +35,7 @@ class ControllerSpec extends AnyWordSpec {
     "switching a card" when {
       "switching with new card" when {
         val c = new Controller
-        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.state)).asInstanceOf[GameRunningControllerState]
+        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState)).asInstanceOf[GameRunningControllerState]
         val state2 = c.solve(new SwitchCardCommand(4, NEW_CARD, state1)).asInstanceOf[GameRunningControllerState]
         "open card is the new from index" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))
@@ -43,7 +43,7 @@ class ControllerSpec extends AnyWordSpec {
       }
       "switching with open card" when {
         val c = new Controller
-        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.state)).asInstanceOf[GameRunningControllerState]
+        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState)).asInstanceOf[GameRunningControllerState]
         val state2 = c.solve(new SwitchCardCommand(4, OPENCARD, state1)).asInstanceOf[GameRunningControllerState]
         "indexed and open card are switched" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))

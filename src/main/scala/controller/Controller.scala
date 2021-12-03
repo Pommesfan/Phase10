@@ -20,7 +20,7 @@ class Controller extends Observable:
 
   def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
   
-  var state:ControllerState = new InitialState
+  private var state:ControllerState = new InitialState
   
   def getState = state
   

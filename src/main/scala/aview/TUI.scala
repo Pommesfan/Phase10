@@ -27,7 +27,7 @@ class TUI(controller: Controller) extends Observer {
           if(input == "undo")
             controller.undo
           else
-            val command_try = Try(createCommand(input, controller.state, mode))
+            val command_try = Try(createCommand(input, controller.getState, mode))
             command_try match {
               case Success(command) => controller.solve(command)
               case Failure(command) => println("Eingaben ungültig")
