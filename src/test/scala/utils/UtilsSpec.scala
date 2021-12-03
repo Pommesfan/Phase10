@@ -23,7 +23,7 @@ class UtilsSpec extends AnyWordSpec {
     }
   }
   "groups cards indices to cardGroups from flat Int-list" when {
-    val indices = "2 6 8 ; 4 7 9 5"
+    val indices = "2 6 8 : 4 7 9 5"
     val inputs = List(3,4)
     val result = List(List(2,6,8), List(4,7,9,5))
     "flat int list turn to 2d-list with given lengths" in {

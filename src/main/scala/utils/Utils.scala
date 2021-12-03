@@ -54,7 +54,7 @@ object Utils {
   }
 
   def makeGroupedIndexList(indices:String, numberOfInputs:List[Int]):List[List[Int]] =
-    indices.split(";").toList.map { s =>
+    indices.split(":").toList.map { s =>
       s.trim.split(" ").map(n => n.toInt).toList
     }
 
