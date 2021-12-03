@@ -1,8 +1,8 @@
 package aview
 
 import model.Card
-import utils.{DoCreatePlayersEvent, DoDiscardEvent, DoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
-import controller.{Controller, GameRunningControllerState}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
+import controller.{Controller, Command, CreatePlayerCommand, DiscardCommand, ControllerState, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
 import java.util.Scanner
@@ -22,32 +22,36 @@ class TUI(controller: Controller) extends Observer {
     new Thread {
       override def run(): Unit =
         while (true)
-
           val input = sc.nextLine()
-          mode match
-            case CREATE_PLAYERS => controller.solve(new DoCreatePlayersEvent(input.split(" ").toList))
-            case SWITCH => {
-              val inputs = input.split(" ").toList
-              def index = inputs(0)
-              def mode = inputs(1) match {
-                case "new" => NEW_CARD
-                case "open" => OPENCARD
-              }
-              controller.solve(new DoSwitchCardEvent(inputs(0).toInt, mode))
-            }
-            case DISCARD =>
-              controller.solve(new DoDiscardEvent(getCardsToDiscard(input)))
-            case INJECT =>
-              def inputs =
-                if(input == "n")
-                  None
-                else
-                  val l = input.split(" ")
-                  val pos = if(l(3) == "FRONT") INJECT_TO_FRONT else if(l(3)=="AFTER") INJECT_AFTER else throw new IllegalArgumentException
-                  Some(l(0).toInt, l(1).toInt, l(2).toInt, pos)
-              controller.solve(new DoInjectEvent(inputs))
-
+          if(input == "undo")
+            controller.undo
+          else
+            controller.solve(createCommand(input, controller.state))
     }.start()
+
+  def createCommand(input:String, state:ControllerState):Command = mode match
+    case CREATE_PLAYERS => new CreatePlayerCommand(input.split(" ").toList, state)
+    case SWITCH => {
+      val inputs = input.split(" ").toList
+      def index = inputs(0)
+      def mode = inputs(1) match {
+        case "new" => NEW_CARD
+        case "open" => OPENCARD
+      }
+      new SwitchCardCommand(inputs(0).toInt, mode, state)
+    }
+    case DISCARD =>
+      if(input == "n")
+        new NoDiscardCommand(state)
+      else
+        new DiscardCommand(getCardsToDiscard(input), state)
+    case INJECT =>
+      if(input == "n")
+        new NoInjectCommand(state)
+      else
+        val l = input.split(" ")
+        val pos = if(l(3) == "FRONT") INJECT_TO_FRONT else if(l(3)=="AFTER") INJECT_AFTER else throw new IllegalArgumentException
+        new InjectCommand(l(0).toInt, l(1).toInt, l(2).toInt, pos, state)
 
   def update(e: OutputEvent): String =
     val s = e match
@@ -97,13 +101,10 @@ class TUI(controller: Controller) extends Observer {
     sb.append("\n")
     sb.toString()
 
-  def getCardsToDiscard(input: String):Option[List[List[Int]]] =
-    if(input == "n")
-      None
-    else
-      val g = controller.getGameData
-      def r = g._1
-      def t = g._2
-      def numberOfInputs = r.validators(t.current_player).getNumberOfInputs()
-      Some(Utils.makeGroupedIndexList(input, numberOfInputs))
+  def getCardsToDiscard(input: String):List[List[Int]] =
+    val g = controller.getGameData
+    def r = g._1
+    def t = g._2
+    def numberOfInputs = r.validators(t.current_player).getNumberOfInputs()
+    Utils.makeGroupedIndexList(input, numberOfInputs)
 }

@@ -1,13 +1,13 @@
 package aview
-import controller.{Controller, GameRunningControllerState}
+import controller.{Controller, CreatePlayerCommand, GameRunningControllerState}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import utils.{GoToDiscardEvent, DoCreatePlayersEvent, GameStartedEvent, TurnEndedEvent}
+import utils.{GameStartedEvent, GoToDiscardEvent, TurnEndedEvent}
 
 class TUI_Spec extends AnyWordSpec {
   "A TUI" when {
     val c = new Controller
-    val initialState = c.solve(new DoCreatePlayersEvent(List("Player A", "Player B")))
+    val initialState = c.solve(new CreatePlayerCommand(List("Player A", "Player B"), c.state))
     val tui = new TUI(c)
     "Asking for player name after programm started" in {
       tui.update(new GameStartedEvent) should be("Namen eingeben:")
@@ -36,8 +36,7 @@ class TUI_Spec extends AnyWordSpec {
         s(i).matches((i - 12).toString + ": " + regexCard) should be(true)
     }
     "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
-      tui.getCardsToDiscard("n") should be(None)
-      tui.getCardsToDiscard("9 3 6 ; 5 7 4") should be(Some(List(List(9, 3, 6), List(5, 7, 4))))
+      tui.getCardsToDiscard("9 3 6 ; 5 7 4") should be(List(List(9, 3, 6), List(5, 7, 4)))
     }
   }
 }
