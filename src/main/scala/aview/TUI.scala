@@ -27,14 +27,14 @@ class TUI(controller: Controller) extends Observer {
           if(input == "undo")
             controller.undo
           else
-            val command_try = Try(createCommand(input, controller.state))
+            val command_try = Try(createCommand(input, controller.state, mode))
             command_try match {
               case Success(command) => controller.solve(command)
               case Failure(command) => println("Eingaben ungültig")
             }
     }.start()
 
-  def createCommand(input:String, state:ControllerState):Command = mode match
+  def createCommand(input:String, state:ControllerState, mode:Int):Command = mode match
     case CREATE_PLAYERS => new CreatePlayerCommand(input.split(" ").toList, state)
     case SWITCH => {
       val inputs = input.split(" ").toList

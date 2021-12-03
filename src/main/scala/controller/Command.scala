@@ -23,9 +23,9 @@ class NoDiscardCommand(oldState: ControllerState) extends Command:
   override def undoStep(c:Controller):(ControllerState, OutputEvent) = (oldState, new GoToDiscardEvent)
 
 class InjectCommand(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, oldState: ControllerState) extends Command:
-  override def doStep(c:Controller):(ControllerState, OutputEvent) =   oldState.asInstanceOf[InjectState].injectCard(receiving_player, cardIndex, stashIndex, position, c)
+  override def doStep(c:Controller):(ControllerState, OutputEvent) =   oldState.asInstanceOf[InjectControllerState].injectCard(receiving_player, cardIndex, stashIndex, position, c)
   override def undoStep(c:Controller):(ControllerState, OutputEvent) = (oldState, new GoToInjectEvent)
 
 class NoInjectCommand(oldState: ControllerState) extends Command:
-  override def doStep(c:Controller):(ControllerState, OutputEvent) =   oldState.asInstanceOf[InjectState].skipInject(c)
+  override def doStep(c:Controller):(ControllerState, OutputEvent) =   oldState.asInstanceOf[InjectControllerState].skipInject(c)
   override def undoStep(c:Controller):(ControllerState, OutputEvent) = (oldState, new GoToInjectEvent)

@@ -126,7 +126,7 @@ class ControllerSpec extends AnyWordSpec {
       }
     }
     "Inject card to player itself or another if he has already discarded and cards fit to discardedStash" when {
-      def createState(cardStash:List[List[Card]], discardedStash:List[Option[List[List[Card]]]], currentPlayer:Int) = new InjectState(
+      def createState(cardStash:List[List[Card]], discardedStash:List[Option[List[List[Card]]]], currentPlayer:Int) = new InjectControllerState(
         List("PlayerA", "PlayerB"), new RoundData(List.fill(2)(Validator.getValidator(1))),
         new TurnData(currentPlayer, cardStash, Card(2,5), discardedStash)
       )
@@ -172,9 +172,9 @@ class ControllerSpec extends AnyWordSpec {
         val state1 = createState(stash, discardedStash, currentplayer)
         val newState = state1.injectCard(0, cardIndex, stashIndex, position, new Controller)._1
         "should have success" in {
-          newState.isInstanceOf[InjectState] should be(true)
+          newState.isInstanceOf[InjectControllerState] should be(true)
         }
-        val state2 = newState.asInstanceOf[InjectState]
+        val state2 = newState.asInstanceOf[InjectControllerState]
 
         val t1 = state1.t
         val t2 = state2.t

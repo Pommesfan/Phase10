@@ -69,7 +69,7 @@ class SwitchCardControllerState(players: List[String], r:RoundData, t:TurnData) 
 
     if(t.discardedStash(currentPlayer).nonEmpty)
       def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash)
-      (new InjectState(players, r, newTurnData), new GoToInjectEvent)
+      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
     else
       def newTurnData = new TurnData(t.current_player, newStash, newOpenCard, t.discardedStash)
       (new DiscardControllerState(players, r, newTurnData), new GoToDiscardEvent)
@@ -92,7 +92,7 @@ class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) ext
 
   def skipDiscard(c:Controller) = (new SwitchCardControllerState(players, r, nextPlayerOnly(c)), new TurnEndedEvent)
 
-class InjectState (players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
+class InjectControllerState(players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
   private def newTurnDataNextPlayer(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
   def injectCard(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, c:Controller): (GameRunningControllerState, OutputEvent) =
       def targetStash = t.discardedStash(receiving_player).get
@@ -118,7 +118,7 @@ class InjectState (players: List[String], r:RoundData, t:TurnData) extends GameR
         def newDiscardedStash = t.discardedStash.updated(receiving_player, Some(targetStash.updated(stashIndex, newDiscardedStashSublist)))
 
         def newTurnData = new TurnData(t.current_player, newCardStash, t.openCard, newDiscardedStash)
-        (new InjectState(players, r, newTurnData), new GoToInjectEvent)
+        (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
       else
         return (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c)), new TurnEndedEvent)
       

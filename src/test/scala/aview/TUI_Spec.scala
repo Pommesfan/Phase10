@@ -1,5 +1,5 @@
 package aview
-import controller.{Controller, CreatePlayerCommand, GameRunningControllerState}
+import controller.{Controller, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InitialState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import utils.{GameStartedEvent, GoToDiscardEvent, TurnEndedEvent}
@@ -47,6 +47,28 @@ class TUI_Spec extends AnyWordSpec {
     }
     "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
       tui.getCardsToDiscard("9 3 6 : 5 7 4") should be(List(List(9, 3, 6), List(5, 7, 4)))
+    }
+    "method createCommand() makes command from inputs accordingly game situation" when {
+      "Switching cards" in {
+        val c = tui.createCommand("1 new", new InitialState, tui.SWITCH)
+        c.isInstanceOf[SwitchCardCommand] should be(true)
+      }
+      "Discard Cards" in {
+        val c = tui.createCommand("0 1 2 : 3 4 5", new InitialState, tui.DISCARD)
+        c.isInstanceOf[DiscardCommand] should be(true)
+      }
+      "Discard none" in {
+        val c = tui.createCommand("n", new InitialState, tui.DISCARD)
+        c.isInstanceOf[NoDiscardCommand] should be(true)
+      }
+      "Inject Card" in {
+        val c = tui.createCommand("0 0 0 FRONT", new InitialState, tui.INJECT)
+        c.isInstanceOf[InjectCommand] should be(true)
+      }
+      "Inject None" in {
+        val c = tui.createCommand("n", new InitialState, tui.INJECT)
+        c.isInstanceOf[NoInjectCommand] should be(true)
+      }
     }
   }
 }
