@@ -3,6 +3,7 @@ import controller.{Controller, CreatePlayerCommand, DiscardCommand, GameRunningC
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import utils.{GameStartedEvent, GoToDiscardEvent, TurnEndedEvent}
+import model.Card
 
 class TUI_Spec extends AnyWordSpec {
   "A TUI" when {
@@ -15,19 +16,14 @@ class TUI_Spec extends AnyWordSpec {
     }
     "when card switched ask to discard" in {
       val s = tui.update(new GoToDiscardEvent).split("\n")
-      s(0) should be("Aktueller Spieler: Player A")
-      s(1) should be("")
-      s(2) should be("Offenliegende Karte:")
-      s(3).matches(regexCard) should be(true)
-      s(4) should be("")
-      s(5) should be("Karten des Spielers:")
-      for (i <- 6 until 16)
-        s(i).matches((i - 6).toString + ": " + regexCard) should be(true)
-      s(16) should be("")
-      s(17) should be("Abzulegende Karten angeben oder n für nicht ablegen:")
+      s(0) should be("Karten des Spielers:")
+      for (i <- 1 until 11)
+        s(i).matches((i - 1).toString + ": " + regexCard) should be(true)
+      s(11) should be("")
+      s(12) should be("Abzulegende Karten angeben oder n für nicht ablegen:")
     }
     "showing status for current player when his turn starts" in {
-      val s1 = tui.update(new TurnEndedEvent)
+      val s1 = tui.update(new TurnEndedEvent(new Card(3,5)))
       val s = s1.split("\n")
       def initialState2 = initialState.asInstanceOf[GameRunningControllerState]
       s(0) should be("Abgelegte Karten")
@@ -38,12 +34,14 @@ class TUI_Spec extends AnyWordSpec {
       s(5) should be("")
       s(6) should be("Aktueller Spieler: " + initialState2.players(initialState2.currentPlayer))
       s(7) should be("")
-      s(8) should be("Offenliegende Karte:")
+      s(8) should be("Neue Karte:")
       s(9).matches(regexCard) should be(true)
-      s(10) should be("")
-      s(11)  should be("Karten des Spielers:")
-      for (i <- 12 until 22)
-        s(i).matches((i - 12).toString + ": " + regexCard) should be(true)
+      s(10) should be("Offenliegende Karte:")
+      s(11).matches(regexCard) should be(true)
+      s(12) should be("")
+      s(13)  should be("Karten des Spielers:")
+      for (i <- 14 until 24)
+        s(i).matches((i - 14).toString + ": " + regexCard) should be(true)
     }
     "method getCardToDiscard() returns None by parameter 'n' or makes Int-List from Number_List as String" in {
       tui.getCardsToDiscard("9 3 6 : 5 7 4") should be(List(List(9, 3, 6), List(5, 7, 4)))

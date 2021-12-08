@@ -70,27 +70,34 @@ class TUI(controller: Controller) extends Observer {
         def currentPlayer = t.current_player
         val playerName = controller.getPlayers()
         e match
-          case e: GoToInjectEvent =>
+          case e1: GoToInjectEvent =>
             mode = INJECT
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+            printDiscardedCards(playerName, t.discardedStash) + printCards(t.cardStash(currentPlayer)) +
               "\nKarten anlegen? Angabe: Spieler, Karte, Stapel, Position (FRONT/AFTER)"
-          case e: GoToDiscardEvent =>
+          case e2: GoToDiscardEvent =>
             mode = DISCARD
-            printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+            printCards(t.cardStash(currentPlayer)) +
               "\nAbzulegende Karten angeben oder n für nicht ablegen:"
-          case e: TurnEndedEvent =>
+          case e3: TurnEndedEvent =>
             mode = SWITCH
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard) +
+            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard, e3.newCard) +
               "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
     println(s)
     s
 
-  def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : String =
+  def printPlayerStatus(player: String, cards: List[Card], openCard: Card, newCard:Card) : String =
     val sb = new StringBuilder
     sb.append("Aktueller Spieler: " + player)
-    sb.append("\n\nOffenliegende Karte:\n")
+    sb.append("\n\nNeue Karte:\n")
+    sb.append(newCard)
+    sb.append("\nOffenliegende Karte:\n")
     sb.append(openCard)
-    sb.append("\n\nKarten des Spielers:\n")
+    sb.append("\n\n" + printCards(cards))
+    sb.toString()
+
+  def printCards(cards: List[Card]): String =
+    val sb = new StringBuilder
+    sb.append("Karten des Spielers:\n")
     cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.toString()
 

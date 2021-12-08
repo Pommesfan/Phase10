@@ -48,20 +48,22 @@ trait ControllerState
 class InitialState extends ControllerState:
   def createPlayers(pPlayers: List[String], c:Controller): (ControllerState, OutputEvent) =
     def numberOfPlayers = pPlayers.size
+    val newCard = c.createCard
     (new SwitchCardControllerState(pPlayers,
       new RoundData(List.fill(numberOfPlayers)(Validator.getValidator(1))),
-      c.createInitialTurnData(numberOfPlayers)),
-      new TurnEndedEvent)
+      c.createInitialTurnData(numberOfPlayers),
+      newCard),
+      new TurnEndedEvent(newCard))
 
 class GameRunningControllerState(val players: List[String], val r:RoundData, val t:TurnData) extends ControllerState:
   def currentPlayer = t.current_player
 
 
-class SwitchCardControllerState(players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
+class SwitchCardControllerState(players: List[String], r:RoundData, t:TurnData, val newCard:Card) extends GameRunningControllerState(players, r, t):
   def switchCards(index: Int, mode: Int, c:Controller):(GameRunningControllerState, OutputEvent) =
     def newOpenCard = t.cardStash(currentPlayer)(index)
     def newPlayerCardStash =
-      if (mode == NEW_CARD) t.cardStash(currentPlayer).updated(index, c.createCard)
+      if (mode == NEW_CARD) t.cardStash(currentPlayer).updated(index, newCard)
       else if(mode == OPENCARD) t.cardStash(currentPlayer).updated(index, t.openCard)
       else throw new IllegalArgumentException
 
@@ -88,9 +90,12 @@ class DiscardControllerState(players: List[String], r:RoundData, t:TurnData) ext
           new TurnData(c.nextPlayer(currentPlayer, players.size), newCardStash, t.openCard, newDiscardedStash)
         else
           nextPlayerOnly(c)
-      (new SwitchCardControllerState(players, r, newTurnData), new TurnEndedEvent)
+      val newCard = c.createCard
+      (new SwitchCardControllerState(players, r, newTurnData, newCard), new TurnEndedEvent(newCard))
 
-  def skipDiscard(c:Controller) = (new SwitchCardControllerState(players, r, nextPlayerOnly(c)), new TurnEndedEvent)
+  def skipDiscard(c:Controller) =
+    val newCard = c.createCard
+    (new SwitchCardControllerState(players, r, nextPlayerOnly(c), newCard), new TurnEndedEvent(newCard))
 
 class InjectControllerState(players: List[String], r:RoundData, t:TurnData) extends GameRunningControllerState(players, r, t):
   private def newTurnDataNextPlayer(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
@@ -120,6 +125,9 @@ class InjectControllerState(players: List[String], r:RoundData, t:TurnData) exte
         def newTurnData = new TurnData(t.current_player, newCardStash, t.openCard, newDiscardedStash)
         (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
       else
-        return (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c)), new TurnEndedEvent)
+        val newCard = c.createCard
+        return (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c), newCard), new TurnEndedEvent(newCard))
       
-  def skipInject(c:Controller) = (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c)), new TurnEndedEvent)
+  def skipInject(c:Controller) =
+    val newCard = c.createCard
+    (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(c), newCard), new TurnEndedEvent(newCard))
