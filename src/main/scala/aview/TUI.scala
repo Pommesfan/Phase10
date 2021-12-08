@@ -103,6 +103,7 @@ class TUI(controller: Controller) extends Observer {
 
   def printDiscardedCards(playerNames:List[String], discardedCards:List[Option[List[List[Card]]]]): String =
     val sb = new StringBuilder
+    sb.append("-"*32 + '\n')
     sb.append("Abgelegte Karten\n")
     for(idx <- playerNames.indices)
       sb.append(playerNames(idx) + "\n")
