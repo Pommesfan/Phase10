@@ -10,7 +10,7 @@ class Controller extends Observable:
   private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
-  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(createCheat)
+  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
   def createInitialTurnData(numberOfPlayers:Int) = new TurnData(
     0,
