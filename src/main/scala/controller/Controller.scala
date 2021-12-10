@@ -10,7 +10,7 @@ class Controller extends Observable:
   private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
-  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))
+  def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(createCheat)
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
   def createInitialTurnData(numberOfPlayers:Int) = new TurnData(
     0,
@@ -18,10 +18,21 @@ class Controller extends Observable:
     createCard,
     List.fill(numberOfPlayers)(None:Option[List[List[Card]]]))
 
+  def createNewRound(r:RoundData, cardStashes: List[List[Card]], discarded:List[Boolean]):RoundData =
+    def updateValidators = r.validators.indices.map { idx =>
+      if(discarded(idx))
+        Validator.getValidator(r.validators(idx).numberOfPhase + 1)
+      else
+        r.validators(idx)
+    }.toList
+    def countErrorpoints = r.errorPoints.indices.map(idx =>
+      r.errorPoints(idx) + cardStashes(idx).map(c =>
+        c.errorPoints).sum).toList
+    new RoundData(updateValidators, countErrorpoints)
+
   def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
   
   private var state:ControllerState = new InitialState
-  
   def getState = state
   
   def getGameData: (RoundData, TurnData) =
@@ -50,7 +61,7 @@ class InitialState extends ControllerState:
     def numberOfPlayers = pPlayers.size
     val newCard = c.createCard
     (new SwitchCardControllerState(pPlayers,
-      new RoundData(List.fill(numberOfPlayers)(Validator.getValidator(1))),
+      new RoundData(List.fill(numberOfPlayers)(Validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
       c.createInitialTurnData(numberOfPlayers),
       newCard),
       new TurnEndedEvent(newCard))
@@ -109,6 +120,14 @@ class InjectControllerState(players: List[String], r:RoundData, t:TurnData) exte
         r.validators(receiving_player).canAppend(discardedSubStash, cardToInject, stashIndex, position))
 
       if(canAppend)
+        if(t.cardStash(currentPlayer).size == 1)
+          val newCard = c.createCard
+          return (new SwitchCardControllerState(
+            players,
+            c.createNewRound(r, t.cardStash.updated(currentPlayer, Nil), t.discardedStash.map(s => s.nonEmpty)),
+            c.createInitialTurnData(players.size),
+            newCard), new TurnEndedEvent(newCard))
+
         def newSublistCardStash = t.cardStash(currentPlayer).drop(cardIndex)
         def newCardStash = t.cardStash.updated(currentPlayer, newSublistCardStash)
 

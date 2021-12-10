@@ -9,3 +9,5 @@ case class Card(color:Int, value:Int):
       case 4 => "Grün"
 
     "Farbe: " + colorName + "; Wert = " + value.toString
+  
+  def errorPoints = if(value < 10) 5 else 10
