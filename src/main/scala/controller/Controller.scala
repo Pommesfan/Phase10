@@ -1,7 +1,7 @@
 package controller
 
 import model.{Card, RoundData, TurnData}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observable, OutputEvent, TurnEndedEvent, Utils}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observable, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
 
 import scala.util.Random
@@ -64,7 +64,7 @@ class InitialState extends ControllerState:
       new RoundData(List.fill(numberOfPlayers)(Validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
       c.createInitialTurnData(numberOfPlayers),
       newCard),
-      new TurnEndedEvent(newCard))
+      new NewRoundEvent(newCard))
 
 class GameRunningControllerState(val players: List[String], val r:RoundData, val t:TurnData) extends ControllerState:
   def currentPlayer = t.current_player
@@ -126,7 +126,7 @@ class InjectControllerState(players: List[String], r:RoundData, t:TurnData) exte
             players,
             c.createNewRound(r, t.cardStash.updated(currentPlayer, Nil), t.discardedStash.map(s => s.nonEmpty)),
             c.createInitialTurnData(players.size),
-            newCard), new TurnEndedEvent(newCard))
+            newCard), new NewRoundEvent(newCard))
 
         def newSublistCardStash = t.cardStash(currentPlayer).drop(cardIndex)
         def newCardStash = t.cardStash.updated(currentPlayer, newSublistCardStash)

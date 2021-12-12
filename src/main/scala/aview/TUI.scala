@@ -1,7 +1,7 @@
 package aview
 
-import model.Card
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
+import model.{Card, RoundData}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
 import controller.{Command, Controller, ControllerState, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
@@ -82,8 +82,22 @@ class TUI(controller: Controller) extends Observer {
             mode = SWITCH
             printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard, e3.newCard) +
               "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
+          case e4:NewRoundEvent =>
+            mode = SWITCH
+            printNewRound(playerName, r) +
+              printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard, e4.newCard) +
+              "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
     println(s)
     s
+
+  def printNewRound(playerNames:List[String], r:RoundData): String =
+    val s = new StringBuilder
+    s.append("\nNeue Runde\n")
+    playerNames.indices.foreach { idx =>
+      def v = r.validators(idx)
+      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.numberOfPhase.toString + ": " + v.description + "\n")
+    }
+    s.toString()
 
   def printPlayerStatus(player: String, cards: List[Card], openCard: Card, newCard:Card) : String =
     val sb = new StringBuilder
