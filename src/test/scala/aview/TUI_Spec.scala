@@ -2,7 +2,7 @@ package aview
 import controller.{Controller, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InitialState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import utils.{GameStartedEvent, GoToDiscardEvent, TurnEndedEvent}
+import utils.{ProgramStartedEvent, GoToDiscardEvent, TurnEndedEvent}
 import model.Card
 
 class TUI_Spec extends AnyWordSpec {
@@ -12,7 +12,7 @@ class TUI_Spec extends AnyWordSpec {
     val tui = new TUI(c)
     val regexCard = "Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))"
     "Asking for player name after programm started" in {
-      tui.update(new GameStartedEvent) should be("Namen eingeben:")
+      tui.update(new ProgramStartedEvent) should be("Namen eingeben:")
     }
     "when card switched ask to discard" in {
       val s = tui.update(new GoToDiscardEvent).split("\n")

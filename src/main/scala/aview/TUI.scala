@@ -1,7 +1,7 @@
 package aview
 
-import model.{Card, RoundData}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
+import model.{Card, RoundData, TurnData}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import controller.{Command, Controller, ControllerState, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
@@ -60,7 +60,7 @@ class TUI(controller: Controller) extends Observer {
 
   def update(e: OutputEvent): String =
     val s = e match
-      case e: GameStartedEvent =>
+      case e: ProgramStartedEvent =>
         mode = CREATE_PLAYERS
         "Namen eingeben:"
       case e: OutputEvent =>
@@ -80,15 +80,19 @@ class TUI(controller: Controller) extends Observer {
               "\nAbzulegende Karten angeben oder n für nicht ablegen:"
           case e3: TurnEndedEvent =>
             mode = SWITCH
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard, e3.newCard) +
-              "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
+            printNewTurn(playerName, t, e3.newCard)
           case e4:NewRoundEvent =>
             mode = SWITCH
-            printNewRound(playerName, r) +
-              printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard, e4.newCard) +
-              "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
+            printNewTurn(playerName, t, e4.newCard)
+          case e5:GameStartedEvent =>
+            mode = SWITCH
+            printNewTurn(playerName, t, e5.newCard)
     println(s)
     s
+
+  def printNewTurn(playerNames:List[String], t:TurnData, newCard:Card):String =
+    printDiscardedCards(playerNames, t.discardedStash) + printPlayerStatus(playerNames(t.current_player), t.cardStash(t.current_player), t.openCard, newCard) +
+      "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
 
   def printNewRound(playerNames:List[String], r:RoundData): String =
     val s = new StringBuilder

@@ -1,6 +1,6 @@
 package controller
 
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, OutputEvent, TurnEndedEvent}
+import utils.{ProgramStartedEvent, GoToDiscardEvent, GoToInjectEvent, OutputEvent, TurnEndedEvent}
 
 trait Command:
   def doStep(c:Controller):(ControllerState, OutputEvent)
@@ -8,7 +8,7 @@ trait Command:
 
 class CreatePlayerCommand(players:List[String], oldState: ControllerState) extends Command:
   override def doStep(c:Controller):(ControllerState, OutputEvent) = oldState.asInstanceOf[InitialState].createPlayers(players, c)
-  override def undoStep(c:Controller):(ControllerState, OutputEvent) = (oldState, new GameStartedEvent)
+  override def undoStep(c:Controller):(ControllerState, OutputEvent) = (oldState, new ProgramStartedEvent)
 
 class SwitchCardCommand(index:Int, mode:Int, oldState: ControllerState) extends Command:
   override def doStep(c:Controller):(ControllerState, OutputEvent) =   oldState.asInstanceOf[SwitchCardControllerState].switchCards(index, mode, c)

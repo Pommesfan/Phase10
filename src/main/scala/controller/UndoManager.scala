@@ -1,6 +1,6 @@
 package controller
 
-import utils.{GameStartedEvent, OutputEvent}
+import utils.{ProgramStartedEvent, OutputEvent}
 
 class UndoManager:
   private var undoStack: List[Command] = Nil
@@ -12,7 +12,7 @@ class UndoManager:
 
   def undoStep(c:Controller):(ControllerState, OutputEvent) =
     undoStack match
-      case Nil => (new InitialState, new GameStartedEvent)
+      case Nil => (new InitialState, new ProgramStartedEvent)
       case head :: stack =>
         val res = head.undoStep(c)
         undoStack = stack
