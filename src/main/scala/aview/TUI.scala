@@ -83,10 +83,10 @@ class TUI(controller: Controller) extends Observer {
             printNewTurn(playerName, t, e3.newCard)
           case e4:NewRoundEvent =>
             mode = SWITCH
-            printNewTurn(playerName, t, e4.newCard)
+            printNewRound(playerName, r) + printNewTurn(playerName, t, e4.newCard)
           case e5:GameStartedEvent =>
             mode = SWITCH
-            printNewTurn(playerName, t, e5.newCard)
+            printNewRound(playerName, r) + printNewTurn(playerName, t, e5.newCard)
     println(s)
     s
 

@@ -6,10 +6,11 @@ import scalafx.scene.paint.Color
 import scalafx.scene.layout.HBox
 import scalafx.scene.layout.VBox
 import scalafx.scene.text.Text
-import scalafx.scene.control.Button
+import scalafx.scene.control.{Button, Alert}
+import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
 import controller.{Controller, DiscardCommand, DiscardControllerState, InjectCommand, InjectControllerState, NoDiscardCommand, NoInjectCommand, SwitchCardCommand, SwitchCardControllerState}
-import model.{Card, TurnData}
+import model.{Card, RoundData, TurnData}
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardWidth}
 
@@ -38,7 +39,7 @@ class PlayingField(controller: Controller) extends Scene {
 
   fill = Color.AliceBlue
 
-  private def createField(t:TurnData, newCard:Option[Card]) = new VBox {
+  private def createField(r:RoundData, t:TurnData, newCard:Option[Card]) = new VBox {
     children = Seq(
       new VBox {
         children = Seq(
@@ -73,7 +74,7 @@ class PlayingField(controller: Controller) extends Scene {
               new VBox {
                 //Buttons
                 children = Seq(
-                  new Text("Aktueller Spieler: " + players(t.current_player)),
+                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).numberOfPhase + ": " + r.validators(t.current_player).description),
                   new Button("Tauschen") {
                     disable = !(mode == SWITCH)
                     onMouseClicked = e => if(selectedPlayerCard != -1 && selectNewOrOpenCard != -1)controller.solve(new SwitchCardCommand(selectedPlayerCard, selectNewOrOpenCard, controller.getState))
@@ -136,12 +137,27 @@ class PlayingField(controller: Controller) extends Scene {
     vbox
   }
 
+  def show_new_Round_Dialog(players:List[String], r: RoundData, t:TurnData): Unit = new Alert(AlertType.Information) {
+    val build = new StringBuilder
+    resizable = true
+    def createString():Unit = players.zipWithIndex.map { p =>
+      val name = p._1
+      val index = p._2
+      build.append("Spieler " + (index + 1) + " " + name + ": " + r.validators(index).description + "; Fehlerpunkte: " + r.errorPoints(index) + "\n")
+    }
+    title = "Neue Runde"
+    headerText = "Folgende Phasen sowie Fehlerpunkte:"
+    createString()
+    contentText = build.toString()
+  }.showAndWait()
+
   //get new card when starting this gui
   val newCard = controller.getState.asInstanceOf[SwitchCardControllerState].newCard
 
-  content = createField(controller.getGameData._2, Some(newCard))
+  content = createField(controller.getGameData._1, controller.getGameData._2, Some(newCard))
 
   def update(e:OutputEvent) =
+    def r = controller.getGameData._1
     def t = controller.getGameData._2
     e match
       case e1: GoToInjectEvent =>
@@ -150,22 +166,23 @@ class PlayingField(controller: Controller) extends Scene {
         selected_position_to_inject = -1
         selectedPlayerCard = -1
         mode = INJECT
-        content = createField(t, None)
+        content = createField(r, t, None)
       case e2: GoToDiscardEvent =>
         mode = DISCARD
-        content = createField(t, None)
+        content = createField(r, t, None)
       case e3: TurnEndedEvent =>
         listToSelect.clear()
         selectedPlayerCard = -1
         selectNewOrOpenCard = -1
         mode = SWITCH
-        content = createField(t, Some(e3.newCard))
+        content = createField(r, t, Some(e3.newCard))
       case e4:NewRoundEvent =>
         listToSelect.clear()
         selectedPlayerCard = -1
         selectNewOrOpenCard = -1
         mode = SWITCH
-        content = createField(t, Some(e4.newCard))
+        show_new_Round_Dialog(players, r, t)
+        content = createField(r, t, Some(e4.newCard))
 
   private class SpaceRectangle(val player:Int, val stash:Int, val position:Int) extends Rectangle {
     fill = Color.SaddleBrown
