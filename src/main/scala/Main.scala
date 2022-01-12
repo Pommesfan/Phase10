@@ -1,10 +1,9 @@
 import controller.Controller
-
 import java.util.Scanner
 import scala.util.Random
-import utils.{GameStartedEvent, Utils}
+import utils.{ProgramStartedEvent, Utils}
 import model.Card
-import aview.TUI
+import aview.{GUI, TUI}
 
 object Main {
   @main def hello: Unit =
@@ -13,8 +12,10 @@ object Main {
 
     val controller = new Controller
     val tui = new TUI(controller)
+    val gui = new GUI(controller)
     tui.start()
-    controller.notifyObservers(new GameStartedEvent)
+    gui.activate()
+    controller.notifyObservers(new ProgramStartedEvent)
 
   def msg = "I was compiled by Scala 3. :)"
 }

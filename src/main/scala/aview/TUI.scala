@@ -1,7 +1,7 @@
 package aview
 
-import model.Card
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, Observer, OutputEvent, TurnEndedEvent, Utils}
+import model.{Card, RoundData, TurnData}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import controller.{Command, Controller, ControllerState, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
@@ -27,14 +27,14 @@ class TUI(controller: Controller) extends Observer {
           if(input == "undo")
             controller.undo
           else
-            val command_try = Try(createCommand(input, controller.state))
+            val command_try = Try(createCommand(input, controller.getState, mode))
             command_try match {
               case Success(command) => controller.solve(command)
               case Failure(command) => println("Eingaben ungültig")
             }
     }.start()
 
-  def createCommand(input:String, state:ControllerState):Command = mode match
+  def createCommand(input:String, state:ControllerState, mode:Int):Command = mode match
     case CREATE_PLAYERS => new CreatePlayerCommand(input.split(" ").toList, state)
     case SWITCH => {
       val inputs = input.split(" ").toList
@@ -60,7 +60,7 @@ class TUI(controller: Controller) extends Observer {
 
   def update(e: OutputEvent): String =
     val s = e match
-      case e: GameStartedEvent =>
+      case e: ProgramStartedEvent =>
         mode = CREATE_PLAYERS
         "Namen eingeben:"
       case e: OutputEvent =>
@@ -70,32 +70,58 @@ class TUI(controller: Controller) extends Observer {
         def currentPlayer = t.current_player
         val playerName = controller.getPlayers()
         e match
-          case e: GoToInjectEvent =>
+          case e1: GoToInjectEvent =>
             mode = INJECT
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+            printDiscardedCards(playerName, t.discardedStash) + printCards(t.cardStash(currentPlayer)) +
               "\nKarten anlegen? Angabe: Spieler, Karte, Stapel, Position (FRONT/AFTER)"
-          case e: GoToDiscardEvent =>
+          case e2: GoToDiscardEvent =>
             mode = DISCARD
-            printPlayerStatus(playerName(currentPlayer), t.cardStash(currentPlayer), t.openCard) +
+            printCards(t.cardStash(currentPlayer)) +
               "\nAbzulegende Karten angeben oder n für nicht ablegen:"
-          case e: TurnEndedEvent =>
+          case e3: TurnEndedEvent =>
             mode = SWITCH
-            printDiscardedCards(playerName, t.discardedStash) + printPlayerStatus(playerName(currentPlayer), t.cardStash(t.current_player), t.openCard) +
-              "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
+            printNewTurn(playerName, t, e3.newCard)
+          case e4:NewRoundEvent =>
+            mode = SWITCH
+            printNewRound(playerName, r) + printNewTurn(playerName, t, e4.newCard)
+          case e5:GameStartedEvent =>
+            mode = SWITCH
+            printNewRound(playerName, r) + printNewTurn(playerName, t, e5.newCard)
     println(s)
     s
 
-  def printPlayerStatus(player: String, cards: List[Card], openCard: Card) : String =
+  def printNewTurn(playerNames:List[String], t:TurnData, newCard:Card):String =
+    printDiscardedCards(playerNames, t.discardedStash) + printPlayerStatus(playerNames(t.current_player), t.cardStash(t.current_player), t.openCard, newCard) +
+      "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
+
+  def printNewRound(playerNames:List[String], r:RoundData): String =
+    val s = new StringBuilder
+    s.append("\nNeue Runde\n")
+    playerNames.indices.foreach { idx =>
+      def v = r.validators(idx)
+      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.numberOfPhase.toString + ": " + v.description + "\n")
+    }
+    s.toString()
+
+  def printPlayerStatus(player: String, cards: List[Card], openCard: Card, newCard:Card) : String =
     val sb = new StringBuilder
     sb.append("Aktueller Spieler: " + player)
-    sb.append("\n\nOffenliegende Karte:\n")
+    sb.append("\n\nNeue Karte:\n")
+    sb.append(newCard)
+    sb.append("\nOffenliegende Karte:\n")
     sb.append(openCard)
-    sb.append("\n\nKarten des Spielers:\n")
+    sb.append("\n\n" + printCards(cards))
+    sb.toString()
+
+  def printCards(cards: List[Card]): String =
+    val sb = new StringBuilder
+    sb.append("Karten des Spielers:\n")
     cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.toString()
 
   def printDiscardedCards(playerNames:List[String], discardedCards:List[Option[List[List[Card]]]]): String =
     val sb = new StringBuilder
+    sb.append("-"*32 + '\n')
     sb.append("Abgelegte Karten\n")
     for(idx <- playerNames.indices)
       sb.append(playerNames(idx) + "\n")
