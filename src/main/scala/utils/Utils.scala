@@ -9,6 +9,11 @@ object Utils {
   val NEW_CARD = 1
   val OPENCARD = 2
 
+  val cardWidth = 120.0
+  val cardProportion = 1.5
+  val NumberSizeProportion = 1.0
+  val space_between_cardstashes = 8
+
   private val r = new Random()
   def randomColor = r.nextInt(4)
   def randomValue = r.nextInt(12)
@@ -57,6 +62,14 @@ object Utils {
     indices.split(":").toList.map { s =>
       s.trim.split(" ").map(n => n.toInt).toList
     }
+    
+  def groupCardIndexes(indices:List[Int], numberOfInputs:List[Int]):List[List[Int]] =
+    var start = 0
+    var list = List[List[Int]]()
+    for(i <- numberOfInputs)
+      list = list :+ indices.slice(start, start + i)
+      start = i
+    list
 
   def fitToSequence(cards: List[Card], cardToInject:Card, position: Int):Boolean =
     def isInSequence(a:Int, b:Int) = a == 12 && b == 1 || b - a == 1
@@ -66,4 +79,9 @@ object Utils {
       isInSequence(cards.last.value, cardToInject.value)
     else
       throw new IllegalArgumentException
+
+
+  abstract class IndexListener:
+    val index:Int
+    def onListen(index:Int): Unit
 }

@@ -3,6 +3,7 @@ package controller
 import model.{Card, RoundData, TurnData}
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
+import scalafx.application.Platform
 
 import scala.util.Random
 
@@ -50,7 +51,7 @@ class Controller extends Observable:
   def undo:ControllerState =
     val res = undoManager.undoStep(this)
     state = res._1
-    notifyObservers(res._2)
+    Platform.runLater(() => notifyObservers(res._2))
     state
 
 
@@ -113,7 +114,6 @@ class InjectControllerState(players: List[String], r:RoundData, t:TurnData) exte
   def injectCard(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, c:Controller): (GameRunningControllerState, OutputEvent) =
       def targetStash = t.discardedStash(receiving_player).get
       def discardedSubStash = targetStash(stashIndex)
-
       def cardToInject = t.cardStash(currentPlayer)(cardIndex)
 
       def canAppend = (t.discardedStash(receiving_player).nonEmpty &&
@@ -128,7 +128,7 @@ class InjectControllerState(players: List[String], r:RoundData, t:TurnData) exte
             c.createInitialTurnData(players.size),
             newCard), new NewRoundEvent(newCard))
 
-        def newSublistCardStash = t.cardStash(currentPlayer).drop(cardIndex)
+        def newSublistCardStash = t.cardStash(currentPlayer).patch(cardIndex, Nil, 1)
         def newCardStash = t.cardStash.updated(currentPlayer, newSublistCardStash)
 
         def newDiscardedStashSublist =
