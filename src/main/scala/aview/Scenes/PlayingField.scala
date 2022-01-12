@@ -6,13 +6,13 @@ import scalafx.scene.paint.Color
 import scalafx.scene.layout.HBox
 import scalafx.scene.layout.VBox
 import scalafx.scene.text.Text
-import scalafx.scene.control.{Button, Alert}
+import scalafx.scene.control.{Alert, Button}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
 import controller.{Controller, DiscardCommand, DiscardControllerState, InjectCommand, InjectControllerState, NoDiscardCommand, NoInjectCommand, SwitchCardCommand, SwitchCardControllerState}
 import model.{Card, RoundData, TurnData}
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
-import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardWidth}
+import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
 
 import scala.collection.mutable.ListBuffer
 
@@ -55,8 +55,8 @@ class PlayingField(controller: Controller) extends Scene {
                     }
                   } else {
                     new Rectangle {
-                      width = 140
-                      height = 210
+                      width = cardWidth
+                      height = cardWidth * cardProportion
                       arcWidth = 40
                       fill = Color.Transparent
                     }
