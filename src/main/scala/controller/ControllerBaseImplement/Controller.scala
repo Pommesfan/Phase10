@@ -48,7 +48,7 @@ class Controller extends ControllerInterface:
   def solve(c: Command):ControllerStateInterface =
     val res = undoManager.doStep(c, this)
     state = res._1
-    notifyObservers(res._2)
+    Platform.runLater(() => notifyObservers(res._2))
     state
 
   def undo:ControllerStateInterface =

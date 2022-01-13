@@ -100,6 +100,9 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
                       case DISCARD => controller.solve(new NoDiscardCommand(controller.getState))
                       case INJECT => controller.solve(new NoInjectCommand(controller.getState))
                     }
+                  },
+                  new Button("Rückgängig") {
+                    onMouseClicked = e => controller.undo
                   }
                 )
               }
