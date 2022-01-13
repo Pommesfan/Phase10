@@ -25,7 +25,7 @@ class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
     e match {
       case _:ProgramStartedEvent =>
       case _:GameStartedEvent =>
-        playingField = new PlayingField(controller)
+        playingField = new PlayingField(controller, e.asInstanceOf[GameStartedEvent].newCard)
         stage.setScene(playingField)
       case _ => playingField.update(e)
     }
