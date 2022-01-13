@@ -1,4 +1,3 @@
-import controller.Controller
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import model.Card

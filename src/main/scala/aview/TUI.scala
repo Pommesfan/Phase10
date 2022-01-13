@@ -2,13 +2,13 @@ package aview
 
 import model.{Card, RoundData, TurnData}
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
-import controller.{Command, Controller, ControllerState, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import controller.{Command, ControllerInterface, ControllerStateInterface, CreatePlayerCommand, DiscardCommand, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
 import java.util.Scanner
 import scala.util.{Failure, Success, Try}
 
-class TUI(controller: Controller) extends Observer {
+class TUI(controller: ControllerInterface) extends Observer {
   val CREATE_PLAYERS = 1
   val SWITCH = 2
   val DISCARD = 3
@@ -34,7 +34,7 @@ class TUI(controller: Controller) extends Observer {
             }
     }.start()
 
-  def createCommand(input:String, state:ControllerState, mode:Int):Command = mode match
+  def createCommand(input:String, state:ControllerStateInterface, mode:Int):Command = mode match
     case CREATE_PLAYERS => new CreatePlayerCommand(input.split(" ").toList, state)
     case SWITCH => {
       val inputs = input.split(" ").toList

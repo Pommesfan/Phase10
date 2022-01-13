@@ -1,9 +1,9 @@
-import controller.Controller
 import java.util.Scanner
 import scala.util.Random
 import utils.{ProgramStartedEvent, Utils}
 import model.Card
 import aview.{GUI, TUI}
+import controller.ControllerBaseImplement.Controller
 
 object Main {
   @main def hello: Unit =

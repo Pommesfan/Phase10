@@ -1,8 +1,9 @@
 package aview
-import controller.{Controller, CreatePlayerCommand, DiscardCommand, GameRunningControllerState, InitialState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import controller.{CreatePlayerCommand, DiscardCommand, GameRunningControllerStateInterface, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import controller.ControllerBaseImplement.{Controller, InitialState}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import utils.{ProgramStartedEvent, GoToDiscardEvent, TurnEndedEvent}
+import utils.{GoToDiscardEvent, ProgramStartedEvent, TurnEndedEvent}
 import model.Card
 
 class TUI_Spec extends AnyWordSpec {
@@ -25,7 +26,7 @@ class TUI_Spec extends AnyWordSpec {
     "showing status for current player when his turn starts" in {
       val s1 = tui.update(new TurnEndedEvent(new Card(3,5)))
       val s = s1.split("\n")
-      def initialState2 = initialState.asInstanceOf[GameRunningControllerState]
+      def initialState2 = initialState.asInstanceOf[GameRunningControllerStateInterface]
       s(0) should be("-" * 32)
       s(1) should be("Abgelegte Karten")
       s(2) should be("Player A")
