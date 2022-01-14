@@ -15,9 +15,7 @@ val d = new D(13)
 d.a
 d.b
 
-trait E(val f:Int)
+def hi(a:Int, b:Int = 4) = a * b
 
-trait F(val i:Int) extends E(i)
-
-val f = new F(3)
-g.i
+hi(6)
+hi(6,b = 9)

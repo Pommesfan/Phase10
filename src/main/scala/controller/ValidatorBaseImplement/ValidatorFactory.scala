@@ -1,12 +1,13 @@
-package controller
+package controller.ValidatorBaseImplement
 
-import utils.Utils
+import controller.*
 import model.Card
+import utils.Utils
 
 object GroupType extends Enumeration:
   val MULTIPLES, SAME_COLOR, SEQUENCE = Value
 
-object Validator {
+class ValidatorFactory extends ValidatorFactoryInterface {
   def getValidator(index : Int): ValidatorStrategy = index match {
     case 1 => new Phase1Validator
     case 2 => new Phase2Validator
@@ -23,9 +24,8 @@ object Validator {
 
 private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 
-abstract class ValidatorStrategy(val numberOfPhase:Int):
+private abstract class ValidatorStrategy(val numberOfPhase:Int) extends ValidatorStrategyInterface:
   protected val cardGroups: List[CardGroup]
-  def description:String
   def group_types = cardGroups.map(cg => cg.groupType)
   def getNumberOfPhase(): Int = numberOfPhase
   def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)

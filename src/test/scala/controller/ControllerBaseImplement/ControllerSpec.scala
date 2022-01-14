@@ -1,17 +1,19 @@
 package controller.ControllerBaseImplement
 
-import controller.{CreatePlayerCommand, GameRunningControllerStateInterface, SwitchCardCommand, Validator}
+import controller.{GameRunningControllerStateInterface, ValidatorFactoryInterface}
+import controller.ValidatorBaseImplement.ValidatorFactory
 import model.{Card, RoundData, TurnData}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import utils.Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
-import utils.{TurnEndedEvent, Utils}
+import utils.{DoCreatePlayerEvent, DoSwitchCardEvent, TurnEndedEvent, Utils}
 
 class ControllerSpec extends AnyWordSpec {
   "A Controller" when {
+    val validatorFactory: ValidatorFactoryInterface = new ValidatorFactory
     "starts game with selected players" when {
       val c = new Controller
-      val s = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState))
+      val s = c.solve(new DoCreatePlayerEvent(List("PlayerA", "PlayerB")), executePlatform_runLater = false)
       "should return an SwitchCardControllerState" in {
         s.isInstanceOf[SwitchCardControllerState] should be(true)
       }
@@ -33,16 +35,16 @@ class ControllerSpec extends AnyWordSpec {
     "switching a card" when {
       "switching with new card" when {
         val c = new Controller
-        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState)).asInstanceOf[GameRunningControllerStateInterface]
-        val state2 = c.solve(new SwitchCardCommand(4, NEW_CARD, state1)).asInstanceOf[GameRunningControllerStateInterface]
+        val state1 = c.solve(new DoCreatePlayerEvent(List("PlayerA", "PlayerB")), false).asInstanceOf[GameRunningControllerStateInterface]
+        val state2 = c.solve(new DoSwitchCardEvent(4, NEW_CARD), false).asInstanceOf[GameRunningControllerStateInterface]
         "open card is the new from index" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))
         }
       }
       "switching with open card" when {
         val c = new Controller
-        val state1 = c.solve(new CreatePlayerCommand(List("PlayerA", "PlayerB"), c.getState)).asInstanceOf[GameRunningControllerStateInterface]
-        val state2 = c.solve(new SwitchCardCommand(4, OPENCARD, state1)).asInstanceOf[GameRunningControllerStateInterface]
+        val state1 = c.solve(new DoCreatePlayerEvent(List("PlayerA", "PlayerB")), false).asInstanceOf[GameRunningControllerStateInterface]
+        val state2 = c.solve(new DoSwitchCardEvent(4, OPENCARD), false).asInstanceOf[GameRunningControllerStateInterface]
         "indexed and open card are switched" in {
           state2.t.openCard should be(state1.t.cardStash(0)(4))
           state2.t.cardStash(0)(4) should be(state1.t.openCard)
@@ -53,7 +55,7 @@ class ControllerSpec extends AnyWordSpec {
       "discard cards" when {
         val indices = List(List(0,1,2), List(3,4,5))
         def createState(cardStash:List[List[Card]]) = new DiscardControllerState(
-          List("AA", "BB"), RoundData(List.fill(2)(Validator.getValidator(1)), List.fill(2)(0)),
+          List("AA", "BB"), RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
           new TurnData(
             0,
             cardStash,
@@ -125,7 +127,7 @@ class ControllerSpec extends AnyWordSpec {
     }
     "Inject card to player itself or another if he has already discarded and cards fit to discardedStash" when {
       def createState(cardStash:List[List[Card]], discardedStash:List[Option[List[List[Card]]]], currentPlayer:Int) = new InjectControllerState(
-        List("PlayerA", "PlayerB"), new RoundData(List.fill(2)(Validator.getValidator(1)), List.fill(2)(0)),
+        List("PlayerA", "PlayerB"), new RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
         new TurnData(currentPlayer, cardStash, Card(2,5), discardedStash)
       )
 
@@ -195,7 +197,7 @@ class ControllerSpec extends AnyWordSpec {
         )
         val state1 = new InjectControllerState(
           List("PlayerA", "PlayerB"),
-          new RoundData(List.fill(2)(Validator.getValidator(1)), List.fill(2)(0)),
+          new RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
           new TurnData(0, stash, c.createCard, discardedStash)
         )
 
@@ -203,7 +205,7 @@ class ControllerSpec extends AnyWordSpec {
         val t2 = state2.t
 
         "player have discarded and get in phase 2" in {
-          state2.r.validators.foreach(v => v.numberOfPhase should be(2))
+          state2.r.validators.foreach(v => v.getNumberOfPhase() should be(2))
         }
 
         "have cardstashes of 10 and empty discardedStashes" in {

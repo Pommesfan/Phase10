@@ -1,6 +1,7 @@
 package controller
 
-import utils.{ProgramStartedEvent, OutputEvent}
+import controller.Command
+import utils.{OutputEvent, ProgramStartedEvent}
 
 class UndoManager:
   private var undoStack: List[Command] = Nil

@@ -1,16 +1,16 @@
 package aview
-import controller.{CreatePlayerCommand, DiscardCommand, GameRunningControllerStateInterface, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
-import controller.ControllerBaseImplement.{Controller, InitialState}
+import controller.GameRunningControllerStateInterface
+import controller.ControllerBaseImplement.{Controller, CreatePlayerCommand, DiscardCommand, InitialState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
-import utils.{GoToDiscardEvent, ProgramStartedEvent, TurnEndedEvent}
+import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GoToDiscardEvent, ProgramStartedEvent, TurnEndedEvent}
 import model.Card
 
 class TUI_Spec extends AnyWordSpec {
   "A TUI" when {
-    val c = new Controller
-    val initialState = c.solve(new CreatePlayerCommand(List("Player A", "Player B"), c.getState))
-    val tui = new TUI(c)
+    val controller = new Controller
+    val initialState = controller.solve(new DoCreatePlayerEvent(List("Player A", "Player B")), false)
+    val tui = new TUI(controller)
     val regexCard = "Farbe:\\s(Blau|Gelb|Grün|Rot);\\sWert\\s=\\s([1-9]|(1[0-2]))"
     "Asking for player name after programm started" in {
       tui.update(new ProgramStartedEvent) should be("Namen eingeben:")
@@ -50,24 +50,24 @@ class TUI_Spec extends AnyWordSpec {
     }
     "method createCommand() makes command from inputs accordingly game situation" when {
       "Switching cards" in {
-        val c = tui.createCommand("1 new", new InitialState, tui.SWITCH)
-        c.isInstanceOf[SwitchCardCommand] should be(true)
+        val c = tui.createInputEvent("1 new", tui.SWITCH)
+        c.isInstanceOf[DoSwitchCardEvent] should be(true)
       }
       "Discard Cards" in {
-        val c = tui.createCommand("0 1 2 : 3 4 5", new InitialState, tui.DISCARD)
-        c.isInstanceOf[DiscardCommand] should be(true)
+        val c = tui.createInputEvent("0 1 2 : 3 4 5", tui.DISCARD)
+        c.isInstanceOf[DoDiscardEvent] should be(true)
       }
       "Discard none" in {
-        val c = tui.createCommand("n", new InitialState, tui.DISCARD)
-        c.isInstanceOf[NoDiscardCommand] should be(true)
+        val c = tui.createInputEvent("n", tui.DISCARD)
+        c.isInstanceOf[DoNoDiscardEvent] should be(true)
       }
       "Inject Card" in {
-        val c = tui.createCommand("0 0 0 FRONT", new InitialState, tui.INJECT)
-        c.isInstanceOf[InjectCommand] should be(true)
+        val c = tui.createInputEvent("0 0 0 FRONT", tui.INJECT)
+        c.isInstanceOf[DoInjectEvent] should be(true)
       }
       "Inject None" in {
-        val c = tui.createCommand("n", new InitialState, tui.INJECT)
-        c.isInstanceOf[NoInjectCommand] should be(true)
+        val c = tui.createInputEvent("n", tui.INJECT)
+        c.isInstanceOf[DoNoInjectEvent] should be(true)
       }
     }
   }

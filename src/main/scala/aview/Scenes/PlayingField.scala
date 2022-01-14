@@ -9,9 +9,9 @@ import scalafx.scene.text.Text
 import scalafx.scene.control.{Alert, Button}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
-import controller.{ControllerInterface, DiscardCommand, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import controller.ControllerInterface
 import model.{Card, RoundData, TurnData}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
+import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
 
 import scala.collection.mutable.ListBuffer
@@ -74,10 +74,10 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
               new VBox {
                 //Buttons
                 children = Seq(
-                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).numberOfPhase + ": " + r.validators(t.current_player).description),
+                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).getNumberOfPhase() + ": " + r.validators(t.current_player).description),
                   new Button("Tauschen") {
                     disable = !(mode == SWITCH)
-                    onMouseClicked = e => if(selectedPlayerCard != -1 && selectNewOrOpenCard != -1)controller.solve(new SwitchCardCommand(selectedPlayerCard, selectNewOrOpenCard, controller.getState))
+                    onMouseClicked = e => if(selectedPlayerCard != -1 && selectNewOrOpenCard != -1)controller.solve(new DoSwitchCardEvent(selectedPlayerCard, selectNewOrOpenCard))
                   },
                   new Button("Ablegen") {
                     disable = !(mode == DISCARD)
@@ -86,19 +86,19 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
                       def r = g._1
                       def t = g._2
                       val groupedCardIndexes = Utils.groupCardIndexes(listToSelect.toList, r.validators(t.current_player).getNumberOfInputs())
-                      controller.solve(new DiscardCommand(groupedCardIndexes, controller.getState))
+                      controller.solve(new DoDiscardEvent(groupedCardIndexes))
                   },
                   new Button("Anlegen") {
                     disable = !(mode == INJECT)
                     onMouseClicked = e =>
                       if(!(selectedPlayerToInject == -1 || selectedPlayerCard == -1 || selected_stash_to_inject == -1 || selected_position_to_inject == -1))
-                        controller.solve(new InjectCommand(selectedPlayerToInject, selectedPlayerCard, selected_stash_to_inject, selected_position_to_inject, controller.getState))
+                        controller.solve(new DoInjectEvent(selectedPlayerToInject, selectedPlayerCard, selected_stash_to_inject, selected_position_to_inject))
                   },
                   new Button("nächster Spieler") {
                     disable = !(mode == DISCARD || mode == INJECT)
                     onMouseClicked = e => mode match {
-                      case DISCARD => controller.solve(new NoDiscardCommand(controller.getState))
-                      case INJECT => controller.solve(new NoInjectCommand(controller.getState))
+                      case DISCARD => controller.solve(new DoNoDiscardEvent)
+                      case INJECT => controller.solve(new DoNoInjectEvent)
                     }
                   },
                   new Button("Rückgängig") {

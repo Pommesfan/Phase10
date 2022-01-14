@@ -23,7 +23,10 @@ class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
 
   override def update(e: OutputEvent): String =
     e match {
+      //undo from init players
       case _:ProgramStartedEvent =>
+        if(playingField != null)
+          stage.setScene(StartScreen(controller))
       case _:GameStartedEvent =>
         playingField = new PlayingField(controller, e.asInstanceOf[GameStartedEvent].newCard)
         stage.setScene(playingField)
