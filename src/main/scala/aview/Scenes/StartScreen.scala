@@ -19,6 +19,7 @@ class StartScreen(controller: ControllerInterface) extends Scene {
     padding = Insets(20,20,20,20)
     spacing = 20
     children = Seq(
+      new ImageView("Phase10-Logo.png"),
       new Label("Spielernamen eingeben"),
       input,
       new Button("Spielen") {
