@@ -3,11 +3,12 @@ package controller.ControllerBaseImplement
 import model.{Card, RoundData, TurnData}
 import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
-import controller.{ControllerInterface, ControllerStateInterface, DiscardControllerStateInterface, GameRunningControllerStateInterface, InitialStateInterface, InjectControllerStateInterface, SwitchCardControllerStateInterface, UndoManager, Validator}
+import controller.{ControllerInterface, ControllerStateInterface, GameRunningControllerStateInterface, UndoManager, Validator}
 import scalafx.application.Platform
 import com.google.inject.Inject
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject}
+
 import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
@@ -72,7 +73,7 @@ class Controller @Inject() extends ControllerInterface:
     state
 
 
-class InitialState extends InitialStateInterface:
+class InitialState extends ControllerStateInterface:
   def createPlayers(pPlayers: List[String], c:ControllerInterface): (ControllerStateInterface, OutputEvent) =
     def numberOfPlayers = pPlayers.size
     def controller = c.asInstanceOf[Controller]
@@ -84,11 +85,11 @@ class InitialState extends InitialStateInterface:
       new GameStartedEvent(newCard))
 
 
-class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData, pNewCard:Card) extends SwitchCardControllerStateInterface:
+class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData, pNewCard:Card) extends GameRunningControllerStateInterface:
   override val players: List[String] = pPlayers
   override val r: RoundData = pR
   override val t: TurnData = pT
-  override val newCard: Card = pNewCard
+  val newCard: Card = pNewCard
 
   def switchCards(index: Int, mode: Int, c:ControllerInterface):(GameRunningControllerStateInterface, OutputEvent) =
     def newOpenCard = t.cardStash(currentPlayer)(index)
@@ -107,7 +108,7 @@ class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnDat
       (new DiscardControllerState(players, r, newTurnData), new GoToDiscardEvent)
 
 
-class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends DiscardControllerStateInterface:
+class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends GameRunningControllerStateInterface:
   override val players: List[String] = pPlayers
   override val r: RoundData = pR
   override val t: TurnData = pT
@@ -134,7 +135,7 @@ class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) 
     val newCard = controller.createCard
     (new SwitchCardControllerState(players, r, nextPlayerOnly(controller), newCard), new TurnEndedEvent(newCard))
 
-class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends InjectControllerStateInterface:
+class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends GameRunningControllerStateInterface:
   override val players: List[String] = pPlayers
   override val r: RoundData = pR
   override val t: TurnData = pT

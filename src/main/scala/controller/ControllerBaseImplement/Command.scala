@@ -8,7 +8,7 @@ class CreatePlayerCommand(players:List[String], oldState: ControllerStateInterfa
   override def undoStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent) = (oldState, new ProgramStartedEvent)
 
 class SwitchCardCommand(index:Int, mode:Int, oldState: ControllerStateInterface) extends Command:
-  override def doStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent) =   oldState.asInstanceOf[SwitchCardControllerStateInterface].switchCards(index, mode, c)
+  override def doStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent) =   oldState.asInstanceOf[SwitchCardControllerState].switchCards(index, mode, c)
   override def undoStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent) = (oldState, new TurnEndedEvent(oldState.asInstanceOf[SwitchCardControllerState].newCard))
 
 class DiscardCommand(indices: List[List[Int]], oldState: ControllerStateInterface) extends Command:
