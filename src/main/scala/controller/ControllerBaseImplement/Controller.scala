@@ -5,10 +5,12 @@ import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
 import controller.{Command, ControllerInterface, ControllerStateInterface, DiscardControllerStateInterface, GameRunningControllerStateInterface, InitialStateInterface, InjectControllerStateInterface, SwitchCardControllerStateInterface, UndoManager, Validator}
 import scalafx.application.Platform
-
+import com.google.inject.Inject
+import com.google.inject.name.Names
+import com.google.inject.{Guice, Inject}
 import scala.util.Random
 
-class Controller extends ControllerInterface:
+class Controller @Inject() extends ControllerInterface:
   private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
