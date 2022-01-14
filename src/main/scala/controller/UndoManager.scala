@@ -6,13 +6,13 @@ class UndoManager:
   private var undoStack: List[Command] = Nil
   private var redoStack: List[Command] = Nil
 
-  def doStep(command: Command, c:Controller):(ControllerState, OutputEvent) =
+  def doStep(command: Command, c:ControllerInterface):(ControllerStateInterface, OutputEvent) =
     undoStack = command :: undoStack
     command.doStep(c)
 
-  def undoStep(c:Controller):(ControllerState, OutputEvent) =
+  def undoStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent) =
     undoStack match
-      case Nil => (new InitialState, new ProgramStartedEvent)
+      case Nil => (c.getInitialState(), new ProgramStartedEvent)
       case head :: stack =>
         val res = head.undoStep(c)
         undoStack = stack

@@ -5,9 +5,9 @@ import scalafx.scene.Scene
 import scalafx.scene.control.{Button, Label, TextField}
 import scalafx.scene.image.ImageView
 import scalafx.scene.layout.VBox
-import controller.{Controller, CreatePlayerCommand}
+import controller.{ControllerInterface, CreatePlayerCommand}
 
-class StartScreen(controller: Controller) extends Scene {
+class StartScreen(controller: ControllerInterface) extends Scene {
   content = new VBox {
     val input = new TextField()
 

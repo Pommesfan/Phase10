@@ -9,14 +9,14 @@ import scalafx.scene.text.Text
 import scalafx.scene.control.{Alert, Button}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
-import controller.{Controller, DiscardCommand, DiscardControllerState, InjectCommand, InjectControllerState, NoDiscardCommand, NoInjectCommand, SwitchCardCommand, SwitchCardControllerState}
+import controller.{ControllerInterface, DiscardCommand, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import model.{Card, RoundData, TurnData}
 import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
 
 import scala.collection.mutable.ListBuffer
 
-class PlayingField(controller: Controller) extends Scene {
+class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends Scene {
   val SWITCH = 2
   val DISCARD = 3
   val INJECT = 4
@@ -96,10 +96,13 @@ class PlayingField(controller: Controller) extends Scene {
                   },
                   new Button("nächster Spieler") {
                     disable = !(mode == DISCARD || mode == INJECT)
-                    onMouseClicked = e => controller.getState match {
-                      case _:DiscardControllerState => controller.solve(new NoDiscardCommand(controller.getState))
-                      case _:InjectControllerState => controller.solve(new NoInjectCommand(controller.getState))
+                    onMouseClicked = e => mode match {
+                      case DISCARD => controller.solve(new NoDiscardCommand(controller.getState))
+                      case INJECT => controller.solve(new NoInjectCommand(controller.getState))
                     }
+                  },
+                  new Button("Rückgängig") {
+                    onMouseClicked = e => controller.undo
                   }
                 )
               }
@@ -151,10 +154,7 @@ class PlayingField(controller: Controller) extends Scene {
     contentText = build.toString()
   }.showAndWait()
 
-  //get new card when starting this gui
-  val newCard = controller.getState.asInstanceOf[SwitchCardControllerState].newCard
-
-  content = createField(controller.getGameData._1, controller.getGameData._2, Some(newCard))
+  content = createField(controller.getGameData._1, controller.getGameData._2, Some(newCardInitial))
 
   def update(e:OutputEvent) =
     def r = controller.getGameData._1

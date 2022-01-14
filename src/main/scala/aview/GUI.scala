@@ -4,10 +4,10 @@ import scalafx.application.JFXApp3
 import JFXApp3.PrimaryStage
 import scalafx.scene.Scene
 import aview.Scenes.{PlayingField, StartScreen}
-import controller.Controller
+import controller.ControllerInterface
 import utils.{GameStartedEvent, Observer, OutputEvent, ProgramStartedEvent}
 
-class GUI(controller: Controller) extends JFXApp3 with Observer:
+class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
   private var playingField:PlayingField = null
   def activate() =
     controller.add(this)
@@ -25,7 +25,7 @@ class GUI(controller: Controller) extends JFXApp3 with Observer:
     e match {
       case _:ProgramStartedEvent =>
       case _:GameStartedEvent =>
-        playingField = new PlayingField(controller)
+        playingField = new PlayingField(controller, e.asInstanceOf[GameStartedEvent].newCard)
         stage.setScene(playingField)
       case _ => playingField.update(e)
     }
