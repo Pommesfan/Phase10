@@ -99,7 +99,7 @@ class TUI(controller: ControllerInterface) extends Observer {
     s.append("\nNeue Runde\n")
     playerNames.indices.foreach { idx =>
       def v = r.validators(idx)
-      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.numberOfPhase.toString + ": " + v.description + "\n")
+      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.getNumberOfPhase().toString + ": " + v.description + "\n")
     }
     s.toString()
 

@@ -74,7 +74,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
               new VBox {
                 //Buttons
                 children = Seq(
-                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).numberOfPhase + ": " + r.validators(t.current_player).description),
+                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).getNumberOfPhase() + ": " + r.validators(t.current_player).description),
                   new Button("Tauschen") {
                     disable = !(mode == SWITCH)
                     onMouseClicked = e => if(selectedPlayerCard != -1 && selectNewOrOpenCard != -1)controller.solve(new DoSwitchCardEvent(selectedPlayerCard, selectNewOrOpenCard))

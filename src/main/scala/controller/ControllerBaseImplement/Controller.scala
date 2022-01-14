@@ -3,15 +3,18 @@ package controller.ControllerBaseImplement
 import model.{Card, RoundData, TurnData}
 import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
-import controller.{ControllerInterface, ControllerStateInterface, GameRunningControllerStateInterface, UndoManager, Validator}
+import controller.{ControllerInterface, ControllerStateInterface, GameRunningControllerStateInterface, UndoManager}
 import scalafx.application.Platform
 import com.google.inject.Inject
 import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject}
+import controller.ValidatorFactoryInterface
+import controller.ValidatorBaseImplement.ValidatorFactory
 
 import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
+  val validatorFactory:ValidatorFactoryInterface = new ValidatorFactory
   private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
@@ -26,7 +29,7 @@ class Controller @Inject() extends ControllerInterface:
   def createNewRound(r:RoundData, cardStashes: List[List[Card]], discarded:List[Boolean]):RoundData =
     def updateValidators = r.validators.indices.map { idx =>
       if(discarded(idx))
-        Validator.getValidator(r.validators(idx).numberOfPhase + 1)
+        validatorFactory.getValidator(r.validators(idx).getNumberOfPhase() + 1)
       else
         r.validators(idx)
     }.toList
@@ -37,7 +40,7 @@ class Controller @Inject() extends ControllerInterface:
 
   def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
 
-  def getInitialState():ControllerStateInterface = new InitialState
+  def getInitialState():ControllerStateInterface = new InitialState(validatorFactory)
 
   private var state:ControllerStateInterface = getInitialState()
   def getState = state
@@ -73,13 +76,13 @@ class Controller @Inject() extends ControllerInterface:
     state
 
 
-class InitialState extends ControllerStateInterface:
+class InitialState(validator: ValidatorFactoryInterface) extends ControllerStateInterface:
   def createPlayers(pPlayers: List[String], c:ControllerInterface): (ControllerStateInterface, OutputEvent) =
     def numberOfPlayers = pPlayers.size
     def controller = c.asInstanceOf[Controller]
     val newCard = controller.createCard
     (new SwitchCardControllerState(pPlayers,
-      new RoundData(List.fill(numberOfPlayers)(Validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
+      new RoundData(List.fill(numberOfPlayers)(validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
       controller.createInitialTurnData(numberOfPlayers),
       newCard),
       new GameStartedEvent(newCard))
