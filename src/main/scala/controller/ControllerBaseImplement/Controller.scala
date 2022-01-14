@@ -10,11 +10,13 @@ import com.google.inject.name.Names
 import com.google.inject.{Guice, Inject}
 import controller.ValidatorFactoryInterface
 import controller.ValidatorBaseImplement.ValidatorFactory
+import com.google.inject.Guice
+import scala.Phase10Module
 
 import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
-  val validatorFactory:ValidatorFactoryInterface = new ValidatorFactory
+  val validatorFactory = Guice.createInjector(new Phase10Module).getInstance(classOf[ValidatorFactoryInterface])
   private val undoManager = new UndoManager
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
