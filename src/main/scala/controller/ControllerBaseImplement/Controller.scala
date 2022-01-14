@@ -77,9 +77,8 @@ class Controller @Inject() extends ControllerInterface:
 
 
 class InitialState(validator: ValidatorFactoryInterface) extends ControllerStateInterface:
-  def createPlayers(pPlayers: List[String], c:ControllerInterface): (ControllerStateInterface, OutputEvent) =
+  def createPlayers(pPlayers: List[String], controller:Controller): (ControllerStateInterface, OutputEvent) =
     def numberOfPlayers = pPlayers.size
-    def controller = c.asInstanceOf[Controller]
     val newCard = controller.createCard
     (new SwitchCardControllerState(pPlayers,
       new RoundData(List.fill(numberOfPlayers)(validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
@@ -94,7 +93,7 @@ class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnDat
   override val t: TurnData = pT
   val newCard: Card = pNewCard
 
-  def switchCards(index: Int, mode: Int, c:ControllerInterface):(GameRunningControllerStateInterface, OutputEvent) =
+  def switchCards(index: Int, mode: Int, controller:Controller):(GameRunningControllerStateInterface, OutputEvent) =
     def newOpenCard = t.cardStash(currentPlayer)(index)
     def newPlayerCardStash =
       if (mode == NEW_CARD) t.cardStash(currentPlayer).updated(index, newCard)
@@ -118,8 +117,7 @@ class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) 
 
   private def nextPlayerOnly(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
 
-  def discardCards(cardIndices: List[List[Int]], c:ControllerInterface): (GameRunningControllerStateInterface, OutputEvent) =
-    def controller = c.asInstanceOf[Controller]
+  def discardCards(cardIndices: List[List[Int]], controller:Controller): (GameRunningControllerStateInterface, OutputEvent) =
     def newTurnData:TurnData =
       if (r.validators(currentPlayer).validate(t.cardStash(currentPlayer), cardIndices))
         def playerCards = t.cardStash(currentPlayer)
@@ -133,8 +131,7 @@ class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) 
     val newCard = controller.createCard
     (new SwitchCardControllerState(players, r, newTurnData, newCard), new TurnEndedEvent(newCard))
 
-  def skipDiscard(c:ControllerInterface) =
-    def controller = c.asInstanceOf[Controller]
+  def skipDiscard(controller:Controller) =
     val newCard = controller.createCard
     (new SwitchCardControllerState(players, r, nextPlayerOnly(controller), newCard), new TurnEndedEvent(newCard))
 
@@ -145,9 +142,7 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
 
   private def newTurnDataNextPlayer(c:Controller) = new TurnData(c.nextPlayer(t.current_player, players.size), t.cardStash, t.openCard, t.discardedStash)
 
-  def injectCard(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, c:ControllerInterface): (GameRunningControllerStateInterface, OutputEvent) =
-    def controller = c.asInstanceOf[Controller]
-
+  def injectCard(receiving_player:Int, cardIndex:Int, stashIndex:Int, position:Int, controller:Controller): (GameRunningControllerStateInterface, OutputEvent) =
     def targetStash = t.discardedStash(receiving_player).get
       def discardedSubStash = targetStash(stashIndex)
       def cardToInject = t.cardStash(currentPlayer)(cardIndex)
@@ -183,7 +178,6 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
         val newCard = controller.createCard
         return (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
       
-  def skipInject(c:ControllerInterface) =
-    def controller = c.asInstanceOf[Controller]
+  def skipInject(controller:Controller) =
     val newCard = controller.createCard
     (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
