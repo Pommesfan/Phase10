@@ -1,8 +1,8 @@
 package aview
 
 import model.{Card, RoundData, TurnData}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
-import controller.{Command, ControllerInterface, ControllerStateInterface, CreatePlayerCommand, DiscardCommand, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
+import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoNoDiscardEvent, DoInjectEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
+import controller.{ControllerInterface, ControllerStateInterface}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
 import java.util.Scanner
@@ -27,15 +27,15 @@ class TUI(controller: ControllerInterface) extends Observer {
           if(input == "undo")
             controller.undo
           else
-            val command_try = Try(createCommand(input, controller.getState, mode))
-            command_try match {
-              case Success(command) => controller.solve(command)
-              case Failure(command) => println("Eingaben ungültig")
+            val inputEvent_try = Try(createInputEvent(input, mode))
+            inputEvent_try match {
+              case Success(inputEvent) => controller.solve(inputEvent)
+              case Failure(inputEvent) => println("Eingaben ungültig")
             }
     }.start()
 
-  def createCommand(input:String, state:ControllerStateInterface, mode:Int):Command = mode match
-    case CREATE_PLAYERS => new CreatePlayerCommand(input.split(" ").toList, state)
+  def createInputEvent(input:String, mode:Int):InputEvent = mode match
+    case CREATE_PLAYERS => new DoCreatePlayerEvent(input.split(" ").toList)
     case SWITCH => {
       val inputs = input.split(" ").toList
       def index = inputs(0)
@@ -43,20 +43,20 @@ class TUI(controller: ControllerInterface) extends Observer {
         case "new" => NEW_CARD
         case "open" => OPENCARD
       }
-      new SwitchCardCommand(inputs(0).toInt, mode, state)
+      new DoSwitchCardEvent(inputs(0).toInt, mode)
     }
     case DISCARD =>
       if(input == "n")
-        new NoDiscardCommand(state)
+        new DoNoDiscardEvent
       else
-        new DiscardCommand(getCardsToDiscard(input), state)
+        new DoDiscardEvent(getCardsToDiscard(input))
     case INJECT =>
       if(input == "n")
-        new NoInjectCommand(state)
+        new DoNoInjectEvent
       else
         val l = input.split(" ")
         val pos = if(l(3) == "FRONT") INJECT_TO_FRONT else if(l(3)=="AFTER") INJECT_AFTER else throw new IllegalArgumentException
-        new InjectCommand(l(0).toInt, l(1).toInt, l(2).toInt, pos, state)
+        new DoInjectEvent(l(0).toInt, l(1).toInt, l(2).toInt, pos)
 
   def update(e: OutputEvent): String =
     val s = e match

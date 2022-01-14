@@ -1,10 +1,11 @@
 package controller
 
 import controller.ControllerBaseImplement.Controller
+import controller.Command
 import model.{Card, RoundData, TurnData}
 import scalafx.application.Platform
 import utils.Utils.{randomColor, randomValue}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observable, OutputEvent, TurnEndedEvent, Utils}
+import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, TurnEndedEvent, Utils}
 
 trait ControllerInterface extends Observable:
   def getState:ControllerStateInterface
@@ -15,7 +16,7 @@ trait ControllerInterface extends Observable:
 
   def getPlayers(): List[String]
 
-  def solve(c: Command):ControllerStateInterface
+  def solve(e: InputEvent, executePlatform_runLater:Boolean = true):ControllerStateInterface
 
   def undo:ControllerStateInterface
   

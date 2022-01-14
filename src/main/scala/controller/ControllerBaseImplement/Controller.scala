@@ -1,9 +1,9 @@
 package controller.ControllerBaseImplement
 
 import model.{Card, RoundData, TurnData}
-import utils.{GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
+import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
-import controller.{Command, ControllerInterface, ControllerStateInterface, DiscardControllerStateInterface, GameRunningControllerStateInterface, InitialStateInterface, InjectControllerStateInterface, SwitchCardControllerStateInterface, UndoManager, Validator}
+import controller.{ControllerInterface, ControllerStateInterface, DiscardControllerStateInterface, GameRunningControllerStateInterface, InitialStateInterface, InjectControllerStateInterface, SwitchCardControllerStateInterface, UndoManager, Validator}
 import scalafx.application.Platform
 import com.google.inject.Inject
 import com.google.inject.name.Names
@@ -47,10 +47,22 @@ class Controller @Inject() extends ControllerInterface:
 
   def getPlayers(): List[String] = state.asInstanceOf[GameRunningControllerStateInterface].players
 
-  def solve(c: Command):ControllerStateInterface =
-    val res = undoManager.doStep(c, this)
+  def solve(e: InputEvent, executePlatform_runLater:Boolean = true):ControllerStateInterface =
+    val command = e match {
+      case e1: DoCreatePlayerEvent => new CreatePlayerCommand(e1.players, state)
+      case e2: DoSwitchCardEvent => new SwitchCardCommand(e2.index, e2.mode, state)
+      case e3: DoDiscardEvent => new DiscardCommand(e3.indices, state)
+      case e4: DoNoDiscardEvent => new NoDiscardCommand(state)
+      case e5: DoInjectEvent => new InjectCommand(e5.receiving_player, e5.cardIndex, e5.stashIndex, e5.position, state)
+      case e6: DoNoInjectEvent => new NoInjectCommand(state)
+    }
+    val res = undoManager.doStep(command, this)
     state = res._1
-    Platform.runLater(() => notifyObservers(res._2))
+    if(executePlatform_runLater)
+      Platform.runLater(() => notifyObservers(res._2))
+    else
+      //Platform.runLater causes error in tests
+      notifyObservers(res._2)
     state
 
   def undo:ControllerStateInterface =
