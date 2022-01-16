@@ -20,3 +20,6 @@ jobs:
         distribution: 'temurin'
     - name: Run tests
       run: sbt test
+
+after_success:
+  - sbt jacocoCoveralls
