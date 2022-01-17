@@ -17,7 +17,7 @@ import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
   val validatorFactory = Guice.createInjector(new Phase10Module).getInstance(classOf[ValidatorFactoryInterface])
-  private val undoManager = new UndoManager
+  private val undoManager = new UndoManager[Controller]
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
   def createCardStash(numberOfPlayers: Int): List[List[Card]] = List.fill(numberOfPlayers)(List.fill(10)(createCard))

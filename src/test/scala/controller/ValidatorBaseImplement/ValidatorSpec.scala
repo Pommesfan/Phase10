@@ -1,10 +1,11 @@
-package controller
-import org.scalatest.wordspec.AnyWordSpec
-import org.scalatest.matchers.should.Matchers.*
+package controller.ValidatorBaseImplement
+
+import controller.ValidatorFactoryInterface
 import model.Card
+import org.scalatest.matchers.should.Matchers.*
+import org.scalatest.wordspec.AnyWordSpec
 import utils.Utils
-import Utils.{INJECT_AFTER, INJECT_TO_FRONT}
-import controller.ValidatorBaseImplement.ValidatorFactory
+import utils.Utils.{INJECT_AFTER, INJECT_TO_FRONT}
 
 class ValidatorSpec extends AnyWordSpec {
   "A Validator" when {
