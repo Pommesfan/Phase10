@@ -2,6 +2,6 @@ package controller
 
 import utils.OutputEvent
 
-trait Command:
-  def doStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent)
-  def undoStep(c:ControllerInterface):(ControllerStateInterface, OutputEvent)
+trait Command[C <: ControllerInterface]:
+  def doStep(c:C):(ControllerStateInterface, OutputEvent)
+  def undoStep(c:C):(ControllerStateInterface, OutputEvent)
