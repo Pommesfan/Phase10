@@ -1,7 +1,7 @@
 package controller
 
 import controller.ControllerBaseImplement.Controller
-import controller.Command
+import controller.CommandTemplate
 import model.{Card, RoundData, TurnData}
 import scalafx.application.Platform
 import utils.Utils.{randomColor, randomValue}
