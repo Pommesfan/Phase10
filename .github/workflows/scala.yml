@@ -19,4 +19,10 @@ jobs:
         java-version: '11'
         distribution: 'temurin'
     - name: Run tests
-      run: sbt test
+      run: sbt jacoco
+    - name: Download Codecov
+      run: curl -Os https://uploader.codecov.io/latest/linux/codecov
+    - name: Add x Flag
+      run: chmod +x codecov
+    - name: Run Codecov
+      run: ./codecov -t ${{ secrets.CODECOV_TOKEN }} 
