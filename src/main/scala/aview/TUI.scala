@@ -26,6 +26,8 @@ class TUI(controller: ControllerInterface) extends Observer {
           val input = sc.nextLine()
           if(input == "undo")
             controller.undo
+          else if(input=="exit")
+            System.exit(0)
           else
             val inputEvent_try = Try(createInputEvent(input, mode))
             inputEvent_try match {
