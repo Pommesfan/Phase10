@@ -11,12 +11,15 @@ import com.google.inject.{Guice, Inject}
 import controller.ValidatorFactoryInterface
 import controller.ValidatorBaseImplement.ValidatorFactory
 import com.google.inject.Guice
+import model.FileIoInterface
+import model.JsonImplement.FileIoJson
 import scala.Phase10Module
 
 import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
   val validatorFactory = Guice.createInjector(new Phase10Module).getInstance(classOf[ValidatorFactoryInterface])
+  val fileIO = new FileIoJson
   private val undoManager = new UndoManager[Controller]
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
@@ -76,6 +79,8 @@ class Controller @Inject() extends ControllerInterface:
     state = res._1
     Platform.runLater(() => notifyObservers(res._2))
     state
+
+  def save: Unit = fileIO.save(state.asInstanceOf[GameRunningControllerStateInterface])
 
 
 class InitialState(validator: ValidatorFactoryInterface) extends ControllerStateInterface:

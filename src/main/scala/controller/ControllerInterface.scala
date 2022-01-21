@@ -20,6 +20,8 @@ trait ControllerInterface extends Observable:
 
   def undo:ControllerStateInterface
 
+  def save: Unit
+
 
 trait ControllerStateInterface
 

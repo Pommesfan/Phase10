@@ -24,16 +24,17 @@ class TUI(controller: ControllerInterface) extends Observer {
       override def run(): Unit =
         while (true)
           val input = sc.nextLine()
-          if(input == "undo")
-            controller.undo
-          else if(input=="exit")
-            System.exit(0)
-          else
-            val inputEvent_try = Try(createInputEvent(input, mode))
-            inputEvent_try match {
-              case Success(inputEvent) => controller.solve(inputEvent)
-              case Failure(inputEvent) => println("Eingaben ungültig")
-            }
+          input match {
+            case "undo" => controller.undo
+            case "exit" => System.exit(0)
+            case "save" => controller.save
+            case _ =>
+              val inputEvent_try = Try(createInputEvent(input, mode))
+              inputEvent_try match {
+                case Success(inputEvent) => controller.solve(inputEvent)
+                case Failure(inputEvent) => println("Eingaben ungültig")
+              }
+          }
     }.start()
 
   def createInputEvent(input:String, mode:Int):InputEvent = mode match
