@@ -19,7 +19,7 @@ import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
   val validatorFactory = Guice.createInjector(new Phase10Module).getInstance(classOf[ValidatorFactoryInterface])
-  val fileIO = new FileIoJson
+  val fileIO = Guice.createInjector(new Phase10Module).getInstance(classOf[FileIoInterface])
   private val undoManager = new UndoManager[Controller]
 
   def createCard: Card = Card(randomColor + 1, randomValue + 1)
