@@ -26,9 +26,10 @@ class FileIoXml extends FileIoInterface:
     def t = state.t
 
     <players type="array"> {
-      state.players.map(s =>
-        <value> {s} </value>)
-      } </players>
+        state.players.map(s =>
+          <value> {s} </value>)
+      }
+    </players>
     <RoundData>
       <numberOfPhase type="array">
         {r.validators.map(v =>
@@ -42,6 +43,17 @@ class FileIoXml extends FileIoInterface:
       </errorPoints>
     </RoundData>
     <TurnData>
+      <cardStash type="array">
+        <value type="array">
+          {t.cardStash.map(cs =>
+            <value type="array">
+              {cs.map(c =>
+                cardToXML(c)
+            )}
+            </value>
+        )}
+        </value>
+      </cardStash>
       <currentPlayer> {t.current_player} </currentPlayer>
       <openCard>
         {cardToXML(t.openCard)}
