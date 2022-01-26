@@ -1,7 +1,7 @@
 package model.FileIoXmlkImplement
 
 import controller.GameRunningControllerStateInterface
-import model.{FileIoInterface, RoundData, TurnData}
+import model.{Card, FileIoInterface, RoundData, TurnData}
 
 import java.io.PrintWriter
 
@@ -16,6 +16,10 @@ class FileIoXml extends FileIoInterface:
     override val r: RoundData = null
     override val t: TurnData = null
   }
+
+  private def cardToXML(c:Card) =
+    <color> {c.color} </color>
+    <value> {c.value} </value>
 
   private def toXML(state:GameRunningControllerStateInterface) =
     def r = state.r
@@ -37,4 +41,10 @@ class FileIoXml extends FileIoInterface:
           <value> {e}  </value> )}
       </errorPoints>
     </RoundData>
+    <TurnData>
+      <currentPlayer> {t.current_player} </currentPlayer>
+      <openCard>
+        {cardToXML(t.openCard)}
+      </openCard>
+    </TurnData>
 
