@@ -14,7 +14,6 @@ import com.google.inject.Guice
 import model.FileIoInterface
 import model.JsonImplement.FileIoJson
 import scala.Phase10Module
-
 import scala.util.Random
 
 class Controller @Inject() extends ControllerInterface:
