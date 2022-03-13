@@ -45,7 +45,7 @@ class FileIoXml extends FileIoInterface:
     <TurnData>
       <cardStash type="array">
         <value type="array">
-          {t.cardStash.map(cs =>
+          {t.playerCardDeck.cards.map(cs =>
             <value type="array">
               {cs.map(c =>
                 cardToXML(c)

@@ -10,7 +10,7 @@ import scalafx.scene.control.{Alert, Button}
 import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
 import controller.ControllerInterface
-import model.{Card, RoundData, TurnData}
+import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
 import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
 
@@ -31,8 +31,8 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
 
   var selectNewOrOpenCard = -1
 
-  def getPlayerCardView(t:TurnData) = t.cardStash(t.current_player).indices.map(idx =>
-    new CardView(t.cardStash(t.current_player)(idx), Some(new IndexListener {
+  def getPlayerCardView(t:TurnData) = t.playerCardDeck.cards(t.current_player).indices.map(idx =>
+    new CardView(t.playerCardDeck.cards(t.current_player)(idx), Some(new IndexListener {
       override val index: Int = idx
       override def onListen(index: Int): Unit = if (mode == SWITCH || mode == INJECT) selectedPlayerCard = index else listToSelect.append(index)
   }))).toSeq
@@ -115,18 +115,18 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
         children = getPlayerCardView(t)
       },
       new Text("Abgelegte Karten:"),
-      showDiscardedCards(t.discardedStash)
+      showDiscardedCards(t.discardedCardDeck)
     ),
   }
 
-  def showDiscardedCards(stash:List[Option[List[List[Card]]]]): VBox = {
+  def showDiscardedCards(discardedCardDeck: DiscardedCardDeck): VBox = {
     val vbox = new VBox()
     for(p <- players.indices)
       vbox.getChildren.add(new Text(players(p)))
 
       def showDiscardedStash():HBox =
         val hbox = new HBox()
-        val concreteStash = stash(p).get
+        val concreteStash = discardedCardDeck.cards(p).get
         for(s <- concreteStash.indices)
           def cardGroup = concreteStash(s)
           hbox.getChildren.add(new SpaceRectangle(p, s, INJECT_TO_FRONT))
@@ -135,7 +135,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
           hbox.getChildren.add(new SpaceRectangle(p, s, INJECT_AFTER))
         hbox
 
-      if(stash(p).nonEmpty)
+      if(discardedCardDeck.cards(p).nonEmpty)
         vbox.getChildren.add(showDiscardedStash())
     vbox
   }

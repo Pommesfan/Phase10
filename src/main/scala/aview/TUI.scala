@@ -1,7 +1,7 @@
 package aview
 
-import model.{Card, RoundData, TurnData}
-import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoNoDiscardEvent, DoInjectEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
+import model.{Card, RoundData, TurnData, PlayerCardDeck, DiscardedCardDeck}
+import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import controller.{ControllerInterface, ControllerStateInterface}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
 
@@ -75,11 +75,11 @@ class TUI(controller: ControllerInterface) extends Observer {
         e match
           case e1: GoToInjectEvent =>
             mode = INJECT
-            printDiscardedCards(playerName, t.discardedStash) + printCards(t.cardStash(currentPlayer)) +
+            printDiscardedCards(playerName, t.discardedCardDeck) + printCards(t.playerCardDeck.cards(currentPlayer)) +
               "\nKarten anlegen? Angabe: Spieler, Karte, Stapel, Position (FRONT/AFTER)"
           case e2: GoToDiscardEvent =>
             mode = DISCARD
-            printCards(t.cardStash(currentPlayer)) +
+            printCards(t.playerCardDeck.cards(currentPlayer)) +
               "\nAbzulegende Karten angeben oder n für nicht ablegen:"
           case e3: TurnEndedEvent =>
             mode = SWITCH
@@ -94,7 +94,7 @@ class TUI(controller: ControllerInterface) extends Observer {
     s
 
   def printNewTurn(playerNames:List[String], t:TurnData, newCard:Card):String =
-    printDiscardedCards(playerNames, t.discardedStash) + printPlayerStatus(playerNames(t.current_player), t.cardStash(t.current_player), t.openCard, newCard) +
+    printDiscardedCards(playerNames, t.discardedCardDeck) + printPlayerStatus(playerNames(t.current_player), t.playerCardDeck.cards(t.current_player), t.openCard, newCard) +
       "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
 
   def printNewRound(playerNames:List[String], r:RoundData): String =
@@ -122,13 +122,13 @@ class TUI(controller: ControllerInterface) extends Observer {
     cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.toString()
 
-  def printDiscardedCards(playerNames:List[String], discardedCards:List[Option[List[List[Card]]]]): String =
+  def printDiscardedCards(playerNames:List[String], discardedCardDeck: DiscardedCardDeck): String =
     val sb = new StringBuilder
     sb.append("-"*32 + '\n')
     sb.append("Abgelegte Karten\n")
     for(idx <- playerNames.indices)
       sb.append(playerNames(idx) + "\n")
-      discardedCards(idx) match
+      discardedCardDeck.cards(idx) match
         case s: Some[List[List[Card]]] =>
           s.get.foreach{ c =>
             c.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))

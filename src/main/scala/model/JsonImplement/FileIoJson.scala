@@ -44,12 +44,12 @@ class FileIoJson extends FileIoInterface {
         "newCard" -> getNewCard(state),
         "currentPlayer" -> JsNumber(t.current_player),
         "cardStash" -> JsArray(
-          t.cardStash.map(cs => JsArray(
+          t.playerCardDeck.cards.map(cs => JsArray(
             cs.map(c => cardToJSon(c))
           ))
         ),
         "discardedStash" -> JsArray(
-          t.discardedStash.map(o =>
+          t.discardedCardDeck.cards.map(o =>
             if(o.nonEmpty)
               JsArray(o.get.map(cs =>
                 JsArray(cs.map(c =>
