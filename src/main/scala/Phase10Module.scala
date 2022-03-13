@@ -8,8 +8,8 @@ import net.codingwell.scalaguice.ScalaModule
 import controller.{ControllerInterface, ValidatorFactoryInterface}
 import controller.ControllerBaseImplement.Controller
 import controller.ValidatorBaseImplement.ValidatorFactory
-import model.FileIoInterface
-import model.JsonImplement.FileIoJson
+import model.fileIO.JsonImplement.FileIoJson
+import model.fileIO.FileIoInterface
 
 class Phase10Module extends AbstractModule {
   override def configure(): Unit = {

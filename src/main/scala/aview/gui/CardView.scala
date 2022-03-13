@@ -1,4 +1,4 @@
-package aview
+package aview.gui
 
 import model.Card
 import scalafx.scene.canvas.Canvas

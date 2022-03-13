@@ -1,7 +1,8 @@
-package model.FileIoXmlkImplement
+package model.fileIO.FileIoXmlkImplement
 
 import controller.GameRunningControllerStateInterface
-import model.{Card, FileIoInterface, RoundData, TurnData}
+import model.fileIO.FileIoInterface
+import model.{Card, RoundData, TurnData}
 
 import java.io.PrintWriter
 

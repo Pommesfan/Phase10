@@ -1,9 +1,10 @@
-package model.JsonImplement
+package model.fileIO.JsonImplement
 
 import controller.ControllerBaseImplement.{DiscardControllerState, InjectControllerState, SwitchCardControllerState}
 import controller.GameRunningControllerStateInterface
 import controller.ValidatorBaseImplement.GroupType.Value
-import model.{Card, FileIoInterface, RoundData, TurnData}
+import model.fileIO.FileIoInterface
+import model.{Card, RoundData, TurnData}
 import play.api.libs.json.*
 
 import java.io.PrintWriter

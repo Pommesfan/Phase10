@@ -1,4 +1,4 @@
-package aview.Scenes
+package aview.gui.Scenes
 
 import controller.ControllerBaseImplement.CreatePlayerCommand
 import scalafx.geometry.{Insets, Pos}

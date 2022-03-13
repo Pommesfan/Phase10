@@ -1,10 +1,10 @@
-package aview
+package aview.gui
 
-import scalafx.application.JFXApp3
-import JFXApp3.PrimaryStage
-import scalafx.scene.Scene
-import aview.Scenes.{PlayingField, StartScreen}
+import aview.gui.Scenes.{PlayingField, StartScreen}
 import controller.ControllerInterface
+import scalafx.application.JFXApp3
+import scalafx.application.JFXApp3.PrimaryStage
+import scalafx.scene.Scene
 import utils.{GameStartedEvent, Observer, OutputEvent, ProgramStartedEvent}
 
 class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:

@@ -1,9 +1,9 @@
-package aview
+package aview.tui
 
-import model.{Card, RoundData, TurnData, PlayerCardDeck, DiscardedCardDeck}
-import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observer, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import controller.{ControllerInterface, ControllerStateInterface}
-import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
+import model.*
+import utils.Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
+import utils.*
 
 import java.util.Scanner
 import scala.util.{Failure, Success, Try}

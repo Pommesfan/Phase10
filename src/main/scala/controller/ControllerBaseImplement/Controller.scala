@@ -1,7 +1,7 @@
 package controller.ControllerBaseImplement
 
-import model.{Card, RoundData, TurnData, PlayerCardDeck, DiscardedCardDeck, FileIoInterface, JsonImplement}
-import JsonImplement.FileIoJson
+import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData, fileIO}
+import model.fileIO.JsonImplement.FileIoJson
 import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
 import controller.{ControllerInterface, ControllerStateInterface, GameRunningControllerStateInterface, UndoManager}
@@ -12,6 +12,8 @@ import com.google.inject.{Guice, Inject}
 import controller.ValidatorFactoryInterface
 import controller.ValidatorBaseImplement.ValidatorFactory
 import com.google.inject.Guice
+import model.fileIO.FileIoInterface
+
 import scala.Phase10Module
 import scala.util.Random
 

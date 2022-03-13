@@ -1,4 +1,5 @@
 package aview
+import aview.tui.TUI
 import controller.GameRunningControllerStateInterface
 import controller.ControllerBaseImplement.{Controller, CreatePlayerCommand, DiscardCommand, InitialState, InjectCommand, NoDiscardCommand, NoInjectCommand, SwitchCardCommand}
 import org.scalatest.wordspec.AnyWordSpec

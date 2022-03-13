@@ -1,8 +1,10 @@
+import aview.gui.GUI
+
 import java.util.Scanner
 import scala.util.Random
 import utils.{ProgramStartedEvent, Utils}
 import model.Card
-import aview.{GUI, TUI}
+import aview.tui.TUI
 import controller.ControllerInterface
 import controller.ControllerBaseImplement.Controller
 import com.google.inject.Guice

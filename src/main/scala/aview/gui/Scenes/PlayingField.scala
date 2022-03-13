@@ -1,6 +1,5 @@
-package aview.Scenes
+package aview.gui.Scenes
 
-import aview.CardView
 import scalafx.scene.{Scene, layout}
 import scalafx.scene.paint.Color
 import scalafx.scene.layout.HBox
@@ -13,6 +12,7 @@ import controller.ControllerInterface
 import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
 import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
+import aview.gui.CardView
 
 import scala.collection.mutable.ListBuffer
 
