@@ -49,7 +49,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
     case Color.Green => Color.DarkGreen
   }
 
-  private def waveColor = cardColor match {
+  private def shadowColor = cardColor match {
     case Color.Red => Color.OrangeRed
     case Color.Yellow => Color.LemonChiffon
     case Color.Blue => Color.DeepSkyBlue
@@ -72,10 +72,10 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
   gc.setFont(new Font("Arial", NumberSize))
   gc.fillText(card.value.toString, cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
 
-  gc.setFill(waveColor)
+  gc.setFill(cardColor)
   gc.setEffect(new DropShadow {
     radius = cardWidth / 4
-    color = waveColor
+    color = shadowColor
   })
   drawWave(0, 0, 0, waveDeviation, cardWidth, waveDeviation, cardWidth, 0, cardArc)
   drawWave(0, cardHeight, 0, cardHeight - waveDeviation, cardWidth, cardHeight - waveDeviation, cardWidth, cardHeight, cardArc)
