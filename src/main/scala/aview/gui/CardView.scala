@@ -2,6 +2,7 @@ package aview.gui
 
 import model.Card
 import scalafx.scene.canvas.Canvas
+import scalafx.scene.effect.{DropShadow, Shadow}
 import scalafx.scene.paint.Color
 import scalafx.scene.text.Font
 import utils.Utils.{IndexListener, NumberSizeProportion, cardProportion, cardWidth}
@@ -41,6 +42,20 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
     gc.fill()
   }
 
+  private def digitColor = cardColor match {
+    case Color.Red => Color.FireBrick
+    case Color.Yellow => Color.Gold
+    case Color.Blue => Color.DarkBlue
+    case Color.Green => Color.DarkGreen
+  }
+
+  private def waveColor = cardColor match {
+    case Color.Red => Color.OrangeRed
+    case Color.Yellow => Color.LemonChiffon
+    case Color.Blue => Color.DeepSkyBlue
+    case Color.Green => Color.LawnGreen
+  }
+
   gc.setFill(Color.White)
   gc.fillRect(0, 0, cardWidth, cardHeight)
   gc.setStroke(Color.Black)
@@ -52,10 +67,16 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
     case 4 => Color.Green
   }
 
+  gc.setFill(digitColor)
   gc.setFill(cardColor)
   gc.setFont(new Font("Arial", NumberSize))
   gc.fillText(card.value.toString, cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
 
+  gc.setFill(waveColor)
+  gc.setEffect(new DropShadow {
+    radius = cardWidth / 4
+    color = waveColor
+  })
   drawWave(0, 0, 0, waveDeviation, cardWidth, waveDeviation, cardWidth, 0, cardArc)
   drawWave(0, cardHeight, 0, cardHeight - waveDeviation, cardWidth, cardHeight - waveDeviation, cardWidth, cardHeight, cardArc)
 
