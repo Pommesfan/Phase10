@@ -26,7 +26,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
   private var selectedPlayerToInject = -1
   private var selected_stash_to_inject = -1
   private var selected_position_to_inject = -1
-  private var players = controller.getPlayers()
+  private val players = controller.getPlayers()
   private val listToSelect = new ListBuffer[Int]()
 
   var selectNewOrOpenCard = -1
@@ -151,6 +151,14 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     title = "Neue Runde"
     headerText = "Folgende Phasen sowie Fehlerpunkte:"
     createString()
+    contentText = build.toString()
+  }.showAndWait()
+
+  def show_game_ended_Dialog(player: String): Unit = new Alert(AlertType.Information) {
+    val build = new StringBuilder
+    resizable = true
+    title = "Spielende"
+    headerText = "Spieler " + player + " hat gewonnen"
     contentText = build.toString()
   }.showAndWait()
 

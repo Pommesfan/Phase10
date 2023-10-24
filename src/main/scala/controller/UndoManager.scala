@@ -19,3 +19,7 @@ class UndoManager[C <: ControllerInterface]:
         undoStack = stack
         redoStack = head :: redoStack
         res
+        
+  def reset() =
+    undoStack = Nil
+    redoStack = Nil

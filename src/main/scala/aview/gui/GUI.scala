@@ -5,7 +5,7 @@ import controller.ControllerInterface
 import scalafx.application.JFXApp3
 import scalafx.application.JFXApp3.PrimaryStage
 import scalafx.scene.Scene
-import utils.{GameStartedEvent, Observer, OutputEvent, ProgramStartedEvent}
+import utils.{GameEndedEvent, GameStartedEvent, Observer, OutputEvent, ProgramStartedEvent}
 
 class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
   private var playingField:PlayingField = null
@@ -30,6 +30,9 @@ class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
       case _:GameStartedEvent =>
         playingField = new PlayingField(controller, e.asInstanceOf[GameStartedEvent].newCard)
         stage.setScene(playingField)
+      case e: GameEndedEvent =>
+        playingField.show_game_ended_Dialog(e.winningPlayer)
+        stage.setScene(StartScreen(controller))
       case _ => playingField.update(e)
     }
     ""

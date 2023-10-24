@@ -66,6 +66,9 @@ class TUI(controller: ControllerInterface) extends Observer {
       case e: ProgramStartedEvent =>
         mode = CREATE_PLAYERS
         "Namen eingeben:"
+      case e: GameEndedEvent =>
+        mode = CREATE_PLAYERS
+        "Spieler " + e.winningPlayer + " hat gewonnen\nNamen eingeben:"
       case e: OutputEvent =>
         val g = controller.getGameData
         val r = g._1
