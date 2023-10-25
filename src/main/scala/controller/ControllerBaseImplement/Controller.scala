@@ -91,7 +91,7 @@ class InitialState(validator: ValidatorFactoryInterface) extends ControllerState
     def numberOfPlayers = pPlayers.size
     val newCard = controller.createCard
     (new SwitchCardControllerState(pPlayers,
-      RoundData(List.fill(numberOfPlayers)(validator.getValidator(10)), List.fill(numberOfPlayers)(0)),
+      RoundData(List.fill(numberOfPlayers)(validator.getValidator(1)), List.fill(numberOfPlayers)(0)),
       controller.createInitialTurnData(numberOfPlayers),
       newCard),
       new GameStartedEvent(newCard))
