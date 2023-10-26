@@ -197,15 +197,19 @@ class ControllerSpec extends AnyWordSpec {
         )
         val state1 = new InjectControllerState(
           List("PlayerA", "PlayerB"),
-          new RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
-          new TurnData(0, playerCardDeck, c.createCard, discardedCardDeck)
+          RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
+          TurnData(0, playerCardDeck, c.createCard, discardedCardDeck)
         )
 
         val state2 = state1.injectCard(1, 0, 0, INJECT_TO_FRONT, c)._1
-        val t2 = state2.t
+        "state should be GameRunningControllerState" in {
+          state2.isInstanceOf[GameRunningControllerStateInterface] should be(true)
+        }
+        val state3 = state2.asInstanceOf[GameRunningControllerStateInterface]
+        val t2 = state3.t
 
         "player have discarded and get in phase 2" in {
-          state2.r.validators.foreach(v => v.getNumberOfPhase() should be(2))
+          state3.r.validators.foreach(v => v.getNumberOfPhase() should be(2))
         }
 
         "have cardstashes of 10 and empty discardedStashes" in {
