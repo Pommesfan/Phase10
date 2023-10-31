@@ -173,11 +173,11 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
     else
       (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
 
-  private def getWinningPlayer(playersHaveDiscarded: List[Boolean]): Int =
+  private def getWinningPlayer(playersHaveDiscarded: List[Boolean], newErrorpoints: List[Int]): Int =
     r.validators.zipWithIndex
       .filter((v,idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx))
       .map((_,idx) => idx)
-      .minBy(idx => r.errorPoints(idx))
+      .minBy(idx => newErrorpoints(idx))
 
   private def handle_round_ended(controller: Controller, newCard: Card):(ControllerStateInterface, OutputEvent) =
     def playersHaveDiscarded = players.indices.map(idx => !t.discardedCardDeck.isEmpty(idx)).toList
@@ -186,13 +186,14 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
 
     if(r.validators.zipWithIndex.find((v, idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx)).nonEmpty)
       controller.reset_undo_manager()
+      val newErrorPoints = r.errorPoints.zipWithIndex.map((e,idx) => e + newDeck.getErrorpoints(idx))
       val event = GameEndedEvent(
-        players(getWinningPlayer(playersHaveDiscarded)),
+        players(getWinningPlayer(playersHaveDiscarded, newErrorPoints)),
         players,
         r.validators.zipWithIndex.map((v, idx) =>
           if (playersHaveDiscarded(idx)) v.getNumberOfPhase()
           else v.getNumberOfPhase() - 1),
-        r.errorPoints.zipWithIndex.map((e,idx) => e + newDeck.getErrorpoints(idx))) //add new error points
+        newErrorPoints) //add new error points
       (controller.getInitialState(), event)
     else
       val newState = new SwitchCardControllerState(
