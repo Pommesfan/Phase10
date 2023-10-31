@@ -173,11 +173,14 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
     else
       (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
 
+  private def getWinningPlayer: Int =
+    r.validators.zipWithIndex.filter((v,idx) => v.getNumberOfPhase() == 10).map((_,idx) => idx).minBy(idx => r.errorPoints(idx))
+
   private def handle_round_ended(controller: Controller, newCard: Card):(ControllerStateInterface, OutputEvent) =
     def playersHaveDiscarded = players.indices.map(idx => !t.discardedCardDeck.isEmpty(idx)).toList
     if(r.validators(currentPlayer).getNumberOfPhase() == 10)
       controller.reset_undo_manager()
-      (controller.getInitialState(), GameEndedEvent(players(currentPlayer)))
+      (controller.getInitialState(), GameEndedEvent(players(getWinningPlayer)))
     else
       (new SwitchCardControllerState(
         players,
