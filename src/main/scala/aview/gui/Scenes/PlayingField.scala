@@ -10,7 +10,7 @@ import scalafx.scene.control.Alert.AlertType
 import scalafx.scene.shape.Rectangle
 import controller.ControllerInterface
 import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
-import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
+import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameEndedEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
 import aview.gui.CardView
 
@@ -154,12 +154,20 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     contentText = build.toString()
   }.showAndWait()
 
-  def show_game_ended_Dialog(player: String): Unit = new Alert(AlertType.Information) {
-    val build = new StringBuilder
+  def show_game_ended_Dialog(e: GameEndedEvent): Unit = new Alert(AlertType.Information) {
+    def buildString(): String = {
+      val b = new StringBuilder()
+      for (p <- e.players.zipWithIndex) {
+        def name  = p._1
+        def idx = p._2
+        b.append(name + ": Phase " + e.phases(idx) + "; " + e.errorPoints(idx) + " Fehlerpunkte\n")
+      }
+      b.toString
+    }
     resizable = true
     title = "Spielende"
-    headerText = "Spieler " + player + " hat gewonnen"
-    contentText = build.toString()
+    headerText = "Spieler " + e.winningPlayer + " hat gewonnen"
+    contentText = buildString()
   }.showAndWait()
 
   content = createField(controller.getGameData._1, controller.getGameData._2, Some(newCardInitial))
