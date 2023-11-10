@@ -117,7 +117,7 @@ class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnDat
     if(t.discardedCardDeck.isEmpty(currentPlayer))
       (new DiscardControllerState(players, r, newTurnData), new GoToDiscardEvent)
     else
-      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
+      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent(false))
 
 
 class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends GameRunningControllerStateInterface:
@@ -128,21 +128,21 @@ class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) 
   private def nextPlayerOnly(c:Controller) = TurnData(c.nextPlayer(t.current_player, players.size), t.playerCardDeck, t.openCard, t.discardedCardDeck)
 
   def discardCards(cardIndices: List[List[Int]], controller:Controller): (GameRunningControllerStateInterface, OutputEvent) =
-    def newTurnData:TurnData =
+    val (newTurnData, success) :(TurnData, Boolean) =
       if (r.validators(currentPlayer).validate(t.playerCardDeck.cards(currentPlayer), cardIndices))
         val res = t.playerCardDeck.removeCards(cardIndices, currentPlayer)
         def newPlayerCardDeck = res._1
         def removedCards = res._2
         def newDiscardedCardDeck = t.discardedCardDeck.setCards(currentPlayer, removedCards)
-        TurnData(controller.nextPlayer(currentPlayer, players.size), newPlayerCardDeck, t.openCard, newDiscardedCardDeck)
+        (TurnData(controller.nextPlayer(currentPlayer, players.size), newPlayerCardDeck, t.openCard, newDiscardedCardDeck),true)
       else
-        nextPlayerOnly(controller)
+        (nextPlayerOnly(controller), false)
     val newCard = controller.createCard
-    (new SwitchCardControllerState(players, r, newTurnData, newCard), new TurnEndedEvent(newCard))
+    (new SwitchCardControllerState(players, r, newTurnData, newCard), new TurnEndedEvent(newCard, success))
 
   def skipDiscard(controller:Controller): (SwitchCardControllerState, TurnEndedEvent) =
     val newCard = controller.createCard
-    (new SwitchCardControllerState(players, r, nextPlayerOnly(controller), newCard), new TurnEndedEvent(newCard))
+    (new SwitchCardControllerState(players, r, nextPlayerOnly(controller), newCard), new TurnEndedEvent(newCard, true))
 
 class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends GameRunningControllerStateInterface:
   override val players: List[String] = pPlayers
@@ -169,9 +169,9 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
       val newDiscardedDeck = t.discardedCardDeck.appendCard(cardToInject, receiving_player, stashIndex, position)
 
       def newTurnData = TurnData(t.current_player, newPlayerCardDeck, t.openCard, newDiscardedDeck)
-      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
+      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent(true))
     else
-      (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
+      (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard, false))
 
   private def getWinningPlayer(playersHaveDiscarded: List[Boolean], newErrorpoints: List[Int]): Int =
     r.validators.zipWithIndex
@@ -201,8 +201,8 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
         controller.createNewRound(r, newDeck.cards, playersHaveDiscarded),
         controller.createInitialTurnData(players.size, controller.nextPlayer(t.current_player, players.size)),
         newCard)
-      (newState, new NewRoundEvent(newCard))
+      (newState, new NewRoundEvent(newCard, true))
       
   def skipInject(controller:Controller): (SwitchCardControllerState, TurnEndedEvent) =
     val newCard = controller.createCard
-    (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard))
+    (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard, true))
