@@ -182,7 +182,6 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     def t = controller.getGameData._2
     e match
       case e1: GoToInjectEvent =>
-        if(mode == INJECT && !e1.success)
         selectedPlayerToInject = -1
         selected_stash_to_inject = -1
         selected_position_to_inject = -1

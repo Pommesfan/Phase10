@@ -25,7 +25,7 @@ class TUI_Spec extends AnyWordSpec {
       s(12) should be("Abzulegende Karten angeben oder n für nicht ablegen:")
     }
     "showing status for current player when his turn starts" in {
-      val s1 = tui.update(new TurnEndedEvent(new Card(3,5)))
+      val s1 = tui.update(new TurnEndedEvent(Card(3,5), true))
       val s = s1.split("\n")
       def initialState2 = initialState.asInstanceOf[GameRunningControllerStateInterface]
       s(0) should be("-" * 32)

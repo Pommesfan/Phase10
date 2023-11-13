@@ -117,7 +117,7 @@ class SwitchCardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnDat
     if(t.discardedCardDeck.isEmpty(currentPlayer))
       (new DiscardControllerState(players, r, newTurnData), new GoToDiscardEvent)
     else
-      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent(false))
+      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
 
 
 class DiscardControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) extends GameRunningControllerStateInterface:
@@ -169,7 +169,7 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
       val newDiscardedDeck = t.discardedCardDeck.appendCard(cardToInject, receiving_player, stashIndex, position)
 
       def newTurnData = TurnData(t.current_player, newPlayerCardDeck, t.openCard, newDiscardedDeck)
-      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent(true))
+      (new InjectControllerState(players, r, newTurnData), new GoToInjectEvent)
     else
       (new SwitchCardControllerState(players, r, newTurnDataNextPlayer(controller), newCard), new TurnEndedEvent(newCard, false))
 

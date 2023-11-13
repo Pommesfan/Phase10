@@ -18,7 +18,7 @@ trait OutputEvent extends Event
 
 class ProgramStartedEvent extends OutputEvent
 class GoToDiscardEvent extends OutputEvent
-class GoToInjectEvent(val success: Boolean) extends OutputEvent
+class GoToInjectEvent extends OutputEvent
 class TurnEndedEvent(val newCard: Card, val success: Boolean) extends OutputEvent
 class NewRoundEvent(val newCard: Card, val success: Boolean) extends OutputEvent
 
