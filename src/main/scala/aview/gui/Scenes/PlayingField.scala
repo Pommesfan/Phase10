@@ -154,6 +154,11 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     contentText = build.toString()
   }.showAndWait()
 
+  def moveUnvalidDialog(): Unit = new Alert(AlertType.Information) {
+    resizable = true
+    headerText = "Ungültiger Spielzug"
+  }.showAndWait()
+
   def show_game_ended_Dialog(e: GameEndedEvent): Unit = new Alert(AlertType.Information) {
     def buildString(): String = {
       val b = new StringBuilder()
@@ -187,6 +192,8 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
         mode = DISCARD
         content = createField(r, t, None)
       case e3: TurnEndedEvent =>
+        if(!e3.success)
+          moveUnvalidDialog()
         listToSelect.clear()
         selectedPlayerCard = -1
         selectNewOrOpenCard = -1

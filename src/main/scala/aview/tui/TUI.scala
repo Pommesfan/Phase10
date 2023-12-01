@@ -85,8 +85,9 @@ class TUI(controller: ControllerInterface) extends Observer {
             printCards(t.playerCardDeck.cards(currentPlayer)) +
               "\nAbzulegende Karten angeben oder n für nicht ablegen:"
           case e3: TurnEndedEvent =>
+            def success = if(!e3.success) "Ungültiger Spielzug\n" else ""
             mode = SWITCH
-            printNewTurn(playerName, t, e3.newCard)
+            success + printNewTurn(playerName, t, e3.newCard)
           case e4:NewRoundEvent =>
             mode = SWITCH
             printNewRound(playerName, r) + printNewTurn(playerName, t, e4.newCard)
