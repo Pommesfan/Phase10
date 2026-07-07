@@ -31,24 +31,23 @@ object Utils {
   }
 
   def resolveMultiples(cards : List[Card]): Boolean = {
-    val firstRegular = getFirstRegularCard(cards)
-    firstRegular match
-      case some: Some[RegularCard] =>
-        val commonValue = some.get.value
+    getFirstRegularCard(cards) match
+      case some: Some[(Int, RegularCard)] =>
+        val commonValue = some.value._2.value
         for (c <- cards)
           c match
             case r: RegularCard =>
               if (r.value != commonValue)
                 return false // case one regular card differs from first regular, jokers are always valid
+            case _ =>
         true
       case _ => true // only jokers
   }
 
   def resolveSameColor(cards: List[Card]): Boolean = {
-    val firstRegular = getFirstRegularCard(cards)
-    firstRegular match
-      case some: Some[RegularCard] =>
-        val commonColor = some.get.color
+      getFirstRegularCard(cards) match
+      case some: Some[(Int, RegularCard)] =>
+        val commonColor = some.value._2.color
         for (c <- cards)
           c match
             case r: RegularCard =>
@@ -102,6 +101,7 @@ object Utils {
     cards.zipWithIndex.foreach((c, idx) => {
       cards(idx) match
         case c: RegularCard => return Some((idx, c))
+        case _ =>
     })
     None
 
