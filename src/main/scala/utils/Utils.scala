@@ -13,11 +13,12 @@ object Utils {
   val cardProportion = 1.5
   val NumberSizeProportion = 1.0
   val space_between_cardstashes = 8
+  val JOKER_PROBABILITY = 0.05
 
   private val r = new Random()
   def randomColor: Int = r.nextInt(4)
   def randomValue: Int = r.nextInt(12)
-  def selectJoker: Boolean = r.nextInt(100) < 10
+  def selectJoker: Boolean = r.nextDouble() < JOKER_PROBABILITY
 
   def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
     List.range(0, 10).partition(n => !indexList.contains(n))._1
@@ -65,11 +66,12 @@ object Utils {
       case Some(s) => // iterate from first regular card
         val (start, c) = s
         currentValue = c.value
-        for (idx <- start until cards.size)
+        for (idx <- start + 1 until cards.size)
           // always increment current value, so the value of a regular card after a joker can be checked
           increment()
           cards(idx) match
             case r: RegularCard => if(r.value != currentValue) return false
+            case _ =>
         true
       case _ => true // only jokers
   }

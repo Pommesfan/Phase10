@@ -23,7 +23,7 @@ class Controller @Inject() extends ControllerInterface:
   private val undoManager = new UndoManager[Controller]
 
   def createCard: Card = if(selectJoker) JokerCard() else RegularCard(randomColor + 1, randomValue + 1)
-  def createPlayerCardDeck(numberOfPlayers: Int): PlayerCardDeck = new PlayerCardDeck(
+  private def createPlayerCardDeck(numberOfPlayers: Int): PlayerCardDeck = new PlayerCardDeck(
     List.fill(numberOfPlayers)(List.fill(10)(createCard)))
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
   def createInitialTurnData(numberOfPlayers:Int, currentPlayer:Int): TurnData = TurnData(
