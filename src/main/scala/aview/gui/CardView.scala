@@ -77,7 +77,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
 
   card match
     case c: RegularCard => gc.fillText(c.value.toString, cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
-    case _: JokerCard => gc.fillText("Joker", cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
+    case _: JokerCard => gc.fillText("Joker", cardWidth * 0.1, cardWidth + 10, cardWidth * 0.8)
 
   gc.setFill(cardColor)
   gc.setEffect(new DropShadow {
