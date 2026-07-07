@@ -1,7 +1,7 @@
 package utils
 
 import scala.util.Random
-import model.Card
+import model.{Card, JokerCard, RegularCard}
 
 object Utils {
   val INJECT_TO_FRONT = 1
@@ -15,8 +15,9 @@ object Utils {
   val space_between_cardstashes = 8
 
   private val r = new Random()
-  def randomColor = r.nextInt(4)
-  def randomValue = r.nextInt(12)
+  def randomColor: Int = r.nextInt(4)
+  def randomValue: Int = r.nextInt(12)
+  def selectJoker: Boolean = r.nextInt(100) < 10;
 
   def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
     List.range(0, 10).partition(n => !indexList.contains(n))._1
@@ -31,31 +32,54 @@ object Utils {
   }
 
   def resolveMultiples(cards : List[Card]): Boolean = {
-    val commonValue = cards.head.value
-    for (c <- cards) {
-      if(c.value != commonValue){
-        return false
-      }
+    val firstRegular = getFirstRegularCard(cards)
+    firstRegular match {
+      case some: Some[RegularCard] =>
+        val commonValue = some.get.value
+        for (c <- cards) {
+          c match
+            case r: RegularCard =>
+              if (r.value != commonValue) {
+                return false
+              }
+        }
+        true
+      case _ => true
     }
-    true
-  }
-
-  def resolveSequence(cards: List[Card]): Boolean = {
-    var i = cards.head.value
-    def increment(): Unit = if (i == 12) i = 1 else i += 1
-    for (index <- 1 until cards.size) {
-      increment()
-      if (cards(index).value != i) return false
-    }
-    true
   }
 
   def resolveSameColor(cards: List[Card]): Boolean = {
-    val commonColor = cards.head.color
-    for(c <- cards) {
-      if (c.color != commonColor) return false
+    val firstRegular = getFirstRegularCard(cards)
+    firstRegular match {
+      case some: Some[RegularCard] =>
+        val commonColor = some.get.color
+        for (c <- cards) {
+          c match
+            case r: RegularCard =>
+              if (r.color != commonColor) {
+                return false
+              }
+        }
+        true
+      case _ => true
     }
-    true
+  }
+
+  def resolveSequence(cards: List[Card]): Boolean = {
+    var currentValue = 0;
+    def increment(): Unit = if (currentValue == 12) currentValue = 1 else currentValue += 1
+    val opt = getFirstRegularCard(cards)
+    opt match
+      case Some(s) =>
+        val (start, c) = s
+        for (idx <- start until cards.size) {
+          increment()
+          cards(idx) match {
+            case r: RegularCard => if(r.value != currentValue) return false
+          }
+        }
+        true
+      case _ => true
   }
 
   def makeGroupedIndexList(indices:String, numberOfInputs:List[Int]):List[List[Int]] =
@@ -71,15 +95,21 @@ object Utils {
       start = i
     list
 
-  def fitToSequence(cards: List[Card], cardToInject:Card, position: Int):Boolean =
-    def isInSequence(a:Int, b:Int) = a == 12 && b == 1 || b - a == 1
+  def fitToSequence(cards: List[Card], cardToInject: RegularCard, position: Int, idxFirstRegular: Int, firstRegular: RegularCard):Boolean =
+    def keepInSequence(v: Int): Int = if(v > 12) v - 12 else v
+
     if(position == INJECT_TO_FRONT)
-      isInSequence(cardToInject.value, cards.head.value)
+      keepInSequence(cardToInject.value + idxFirstRegular + 1) == firstRegular.value
     else if(position == INJECT_AFTER)
-      isInSequence(cards.last.value, cardToInject.value)
+      keepInSequence(firstRegular.value + cards.length - idxFirstRegular) == cardToInject.value
     else
       throw new IllegalArgumentException
 
+  def getFirstRegularCard(cards: List[Card]): Option[(Int, RegularCard)] =
+    for (i <- 0 to cards.length)
+      cards(i) match
+        case c: RegularCard => return Some((i, c))
+    None
 
   abstract class IndexListener:
     val index:Int

@@ -1,6 +1,6 @@
 package aview.gui
 
-import model.Card
+import model.{Card, JokerCard, RegularCard}
 import scalafx.scene.canvas.Canvas
 import scalafx.scene.effect.{DropShadow, Shadow}
 import scalafx.scene.paint.Color
@@ -47,30 +47,37 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
     case Color.Yellow => Color.Gold
     case Color.Blue => Color.DarkBlue
     case Color.Green => Color.DarkGreen
+    case Color.Gray => Color.DarkGray
   }
 
   private def shadowColor = cardColor match {
     case Color.Red => Color.OrangeRed
-    case Color.Yellow => Color.LemonChiffon
+    case Color.Yellow => Color.LightYellow
     case Color.Blue => Color.DeepSkyBlue
     case Color.Green => Color.LawnGreen
+    case Color.Gray => Color.LightGray
   }
 
   gc.setFill(Color.White)
   gc.fillRect(0, 0, cardWidth, cardHeight)
   gc.setStroke(Color.Black)
-
-  val cardColor = card.color match {
-    case 1 => Color.Red
-    case 2 => Color.Yellow
-    case 3 => Color.Blue
-    case 4 => Color.Green
+  val cardColor = card match {
+    case c: RegularCard => c.color match {
+      case 1 => Color.Red
+      case 2 => Color.Yellow
+      case 3 => Color.Blue
+      case 4 => Color.Green
+    }
+    case _: JokerCard => Color.Gray
   }
 
+
   gc.setFill(digitColor)
-  gc.setFill(cardColor)
   gc.setFont(new Font("Arial", NumberSize))
-  gc.fillText(card.value.toString, cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
+
+  card match
+    case c: RegularCard => gc.fillText(c.value.toString, cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
+    case _: JokerCard => gc.fillText("Joker", cardWidth / 4.5, cardWidth + 10, cardWidth / 1.5)
 
   gc.setFill(cardColor)
   gc.setEffect(new DropShadow {

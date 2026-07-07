@@ -1,7 +1,7 @@
 package controller.ValidatorBaseImplement
 
 import controller.*
-import model.Card
+import model.{Card, JokerCard, RegularCard}
 import utils.Utils
 
 object GroupType extends Enumeration:
@@ -49,10 +49,18 @@ private abstract class ValidatorStrategy(val numberOfPhase:Int) extends Validato
     true
     
   def canAppend(cards:List[Card], cardToInject:Card, stashIndex:Int, position:Int): Boolean =
-    group_types(stashIndex) match
-      case GroupType.SEQUENCE => Utils.fitToSequence(cards, cardToInject, position)
-      case GroupType.MULTIPLES => cards.head.value == cardToInject.value
-      case GroupType.SAME_COLOR => cards.head.color == cardToInject.color
+    cardToInject match {
+      case _: JokerCard => true
+      case c: RegularCard =>
+        Utils.getFirstRegularCard(cards) match
+          case Some(some) =>
+            val (idx, firstRegular) = some
+            group_types(stashIndex) match
+              case GroupType.SEQUENCE => Utils.fitToSequence(cards, c, position, idx, firstRegular)
+              case GroupType.MULTIPLES => firstRegular.value == c.value
+              case GroupType.SAME_COLOR => firstRegular.color == c.color
+          case None => true
+    }
 
 private class Phase1Validator extends ValidatorStrategy(1):
   override protected val cardGroups: List[CardGroup] = List(new CardGroup(GroupType.MULTIPLES, 3), new CardGroup(GroupType.MULTIPLES, 3))

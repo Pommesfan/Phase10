@@ -4,7 +4,7 @@ import controller.ControllerBaseImplement.{DiscardControllerState, InjectControl
 import controller.GameRunningControllerStateInterface
 import controller.ValidatorBaseImplement.GroupType.Value
 import model.fileIO.FileIoInterface
-import model.{Card, RoundData, TurnData}
+import model.{Card, JokerCard, RegularCard, RoundData, TurnData}
 import play.api.libs.json.*
 
 import java.io.PrintWriter
@@ -13,10 +13,14 @@ class FileIoJson extends FileIoInterface {
   private object GameState extends Enumeration:
     val SWITCH, DISCARD, INJECT = Value
 
-  private def cardToJSon(c:Card) = JsObject(Seq(
-    "color" -> JsNumber(c.color),
-    "value" -> JsNumber(c.value)
-  ))
+  private def cardToJSon(card:Card) = card match {
+    case c: RegularCard => JsObject(Seq(
+      "type" -> JsString("Regular"),
+      "color" -> JsNumber(c.color),
+      "value" -> JsNumber (c.value)
+    ))
+    case _: JokerCard => JsObject(Seq("type" -> JsString("Joker")))
+  }
 
   private def getStateNumber(state:GameRunningControllerStateInterface) = state match {
     case _: SwitchCardControllerState => GameState.SWITCH

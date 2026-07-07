@@ -1,9 +1,9 @@
 package controller.ControllerBaseImplement
 
-import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData, fileIO}
+import model.{Card, DiscardedCardDeck, JokerCard, PlayerCardDeck, RegularCard, RoundData, TurnData, fileIO}
 import model.fileIO.JsonImplement.FileIoJson
 import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameEndedEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, InputEvent, NewRoundEvent, Observable, OutputEvent, ProgramStartedEvent, TurnEndedEvent, Utils}
-import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue}
+import Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD, randomColor, randomValue, selectJoker}
 import controller.{ControllerInterface, ControllerStateInterface, GameRunningControllerStateInterface, UndoManager}
 import scalafx.application.Platform
 import com.google.inject.Inject
@@ -22,7 +22,7 @@ class Controller @Inject() extends ControllerInterface:
   val fileIO: FileIoInterface = Guice.createInjector(new Phase10Module).getInstance(classOf[FileIoInterface])
   private val undoManager = new UndoManager[Controller]
 
-  def createCard: Card = Card(randomColor + 1, randomValue + 1)
+  def createCard: Card = if(selectJoker) JokerCard() else RegularCard(randomColor + 1, randomValue + 1)
   def createPlayerCardDeck(numberOfPlayers: Int): PlayerCardDeck = new PlayerCardDeck(
     List.fill(numberOfPlayers)(List.fill(10)(createCard)))
   def nextPlayer(currentPlayer: Int, numberOfPlayers: Int): Int = (currentPlayer + 1) % numberOfPlayers
@@ -44,7 +44,7 @@ class Controller @Inject() extends ControllerInterface:
         c.errorPoints).sum).toList
       RoundData(updateValidators(), countErrorpoints)
 
-  private def createCheat = List(Card(1,11),Card(2,11),Card(4,11),Card(3,7),Card(1,7),Card(4,7), createCard, createCard, createCard, createCard)
+  private def createCheat = List(RegularCard(1,11), RegularCard(2,11), RegularCard(4,11), RegularCard(3,7), RegularCard(1,7), RegularCard(4,7), createCard, createCard, createCard, createCard)
 
   def getInitialState():ControllerStateInterface = new InitialState(validatorFactory)
 

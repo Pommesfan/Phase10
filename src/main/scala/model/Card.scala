@@ -1,6 +1,9 @@
 package model
 
-case class Card(color:Int, value:Int):
+trait Card:
+  def errorPoints: Int
+
+case class RegularCard(color:Int, value:Int) extends Card:
   override def toString: String =
     def colorName: String = color match
       case 1 => "Rot"
@@ -9,5 +12,9 @@ case class Card(color:Int, value:Int):
       case 4 => "Grün"
 
     "Farbe: " + colorName + "; Wert = " + value.toString
-  
-  def errorPoints = if(value < 10) 5 else 10
+
+  override def errorPoints: Int = if (value < 10) 5 else 10
+
+case class JokerCard() extends Card:
+  override def toString: String = "Joker"
+  override def errorPoints = 25

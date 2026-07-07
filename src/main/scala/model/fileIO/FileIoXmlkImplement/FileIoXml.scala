@@ -2,7 +2,7 @@ package model.fileIO.FileIoXmlkImplement
 
 import controller.GameRunningControllerStateInterface
 import model.fileIO.FileIoInterface
-import model.{Card, RoundData, TurnData}
+import model.{Card, JokerCard, RegularCard, RoundData, TurnData}
 
 import java.io.PrintWriter
 
@@ -18,9 +18,23 @@ class FileIoXml extends FileIoInterface:
     override val t: TurnData = null
   }
 
-  private def cardToXML(c:Card) =
-    <color> {c.color} </color>
-    <value> {c.value} </value>
+  private def cardToXML(card:Card) = card match {
+    case c: RegularCard => {
+      <type>
+        {"Regular"}
+      </type>
+      <color>
+        {c.color}
+      </color>
+      <value>
+        {c.value}
+      </value>
+    }
+    case _: JokerCard =>
+      <type>
+        {"Joker"}
+      </type>
+  }
 
   private def toXML(state:GameRunningControllerStateInterface) =
     def r = state.r
