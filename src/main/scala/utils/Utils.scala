@@ -39,8 +39,8 @@ object Utils {
           c match
             case r: RegularCard =>
               if (r.value != commonValue)
-                return false // case one regular card differs from first regular, jokers are always valid
-            case _ =>
+                return false // case one regular card differs from first regular
+            case _ => // jokers are always valid
         true
       case _ => true // only jokers
   }
@@ -53,7 +53,8 @@ object Utils {
           c match
             case r: RegularCard =>
               if (r.color != commonColor)
-                return false // case one regular card differs from first regular, jokers are always valid
+                return false // case one regular card differs from first regular
+            case _ => // jokers are always valid
         true
       case _ => true // only jokers
   }
