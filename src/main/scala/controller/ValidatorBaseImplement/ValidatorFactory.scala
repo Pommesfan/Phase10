@@ -26,7 +26,7 @@ private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 
 private abstract class ValidatorStrategy(val numberOfPhase:Int) extends ValidatorStrategyInterface:
   protected val cardGroups: List[CardGroup]
-  def group_types = cardGroups.map(cg => cg.groupType)
+  private def group_types = cardGroups.map(cg => cg.groupType)
   def getNumberOfPhase(): Int = numberOfPhase
   def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
   def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean =
@@ -50,7 +50,7 @@ private abstract class ValidatorStrategy(val numberOfPhase:Int) extends Validato
     
   def canAppend(cards:List[Card], cardToInject:Card, stashIndex:Int, position:Int): Boolean =
     cardToInject match {
-      case _: JokerCard => true
+      case _: JokerCard => true // joker card can always be appended
       case c: RegularCard =>
         Utils.getFirstRegularCard(cards) match
           case Some(some) =>
@@ -59,7 +59,7 @@ private abstract class ValidatorStrategy(val numberOfPhase:Int) extends Validato
               case GroupType.SEQUENCE => Utils.fitToSequence(cards, c, position, idx, firstRegular)
               case GroupType.MULTIPLES => firstRegular.value == c.value
               case GroupType.SAME_COLOR => firstRegular.color == c.color
-          case None => true
+          case None => true // case stash has only jokers => every regular card fits
     }
 
 private class Phase1Validator extends ValidatorStrategy(1):

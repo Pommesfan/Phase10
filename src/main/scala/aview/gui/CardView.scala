@@ -8,19 +8,19 @@ import scalafx.scene.text.Font
 import utils.Utils.{IndexListener, NumberSizeProportion, cardProportion, cardWidth}
 
 class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
-  val CARD_ARC_FACTOR = 4.5
-  val WAVE_DEVIATION_FACTOR = 4
-  val cardHeight = cardWidth * cardProportion
-  val cardArc = cardWidth / CARD_ARC_FACTOR
-  val NumberSize = NumberSizeProportion * cardWidth
-  val waveDeviation = cardWidth / WAVE_DEVIATION_FACTOR
+  private val CARD_ARC_FACTOR = 4.5
+  private val WAVE_DEVIATION_FACTOR = 4
+  private val cardHeight = cardWidth * cardProportion
+  private val cardArc = cardWidth / CARD_ARC_FACTOR
+  private val NumberSize = NumberSizeProportion * cardWidth
+  private val waveDeviation = cardWidth / WAVE_DEVIATION_FACTOR
 
   height = cardHeight
   width = cardWidth
 
-  if (!indexListener.isEmpty) onMouseClicked = e => indexListener.get.onListen(indexListener.get.index)
+  if (indexListener.isDefined) onMouseClicked = e => indexListener.get.onListen(indexListener.get.index)
 
-  val gc = graphicsContext2D
+  private val gc = graphicsContext2D
 
   private def drawWave(ax: Double, ay: Double, bx: Double, by: Double, cx: Double, cy: Double, dx: Double, dy: Double, w: Double): Unit = {
     gc.beginPath()
@@ -61,7 +61,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
   gc.setFill(Color.White)
   gc.fillRect(0, 0, cardWidth, cardHeight)
   gc.setStroke(Color.Black)
-  val cardColor = card match {
+  private val cardColor = card match {
     case c: RegularCard => c.color match {
       case 1 => Color.Red
       case 2 => Color.Yellow

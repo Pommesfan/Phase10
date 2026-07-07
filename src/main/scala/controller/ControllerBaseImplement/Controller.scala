@@ -184,7 +184,7 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
 
     val (newDeck, _) = t.playerCardDeck.removeSingleCard(0, currentPlayer)
 
-    if(r.validators.zipWithIndex.find((v, idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx)).nonEmpty)
+    if(r.validators.zipWithIndex.exists((v, idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx)))
       controller.reset_undo_manager()
       val newErrorPoints = r.errorPoints.zipWithIndex.map((e,idx) => e + newDeck.getErrorpoints(idx))
       val event = GameEndedEvent(

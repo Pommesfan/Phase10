@@ -17,69 +17,62 @@ object Utils {
   private val r = new Random()
   def randomColor: Int = r.nextInt(4)
   def randomValue: Int = r.nextInt(12)
-  def selectJoker: Boolean = r.nextInt(100) < 10;
+  def selectJoker: Boolean = r.nextInt(100) < 10
 
   def inverseIndexList(indexList:List[Int], maxIndex:Int): List[Int] =
     List.range(0, 10).partition(n => !indexList.contains(n))._1
 
   def indexesUnique(l:List[Int]): Boolean = {
     val sorted = l.sortWith((a,b) => a < b)
-    for(i <- 0 until sorted.size - 1) {
+    for(i <- 0 until sorted.size - 1)
       if(sorted(i) == sorted(i + 1))
         return false
-    }
     true
   }
 
   def resolveMultiples(cards : List[Card]): Boolean = {
     val firstRegular = getFirstRegularCard(cards)
-    firstRegular match {
+    firstRegular match
       case some: Some[RegularCard] =>
         val commonValue = some.get.value
-        for (c <- cards) {
+        for (c <- cards)
           c match
             case r: RegularCard =>
-              if (r.value != commonValue) {
-                return false
-              }
-        }
+              if (r.value != commonValue)
+                return false // case one regular card differs from first regular, jokers are always valid
         true
-      case _ => true
-    }
+      case _ => true // only jokers
   }
 
   def resolveSameColor(cards: List[Card]): Boolean = {
     val firstRegular = getFirstRegularCard(cards)
-    firstRegular match {
+    firstRegular match
       case some: Some[RegularCard] =>
         val commonColor = some.get.color
-        for (c <- cards) {
+        for (c <- cards)
           c match
             case r: RegularCard =>
-              if (r.color != commonColor) {
-                return false
-              }
-        }
+              if (r.color != commonColor)
+                return false // case one regular card differs from first regular, jokers are always valid
         true
-      case _ => true
-    }
+      case _ => true // only jokers
   }
 
   def resolveSequence(cards: List[Card]): Boolean = {
-    var currentValue = 0;
+    var currentValue = 0
     def increment(): Unit = if (currentValue == 12) currentValue = 1 else currentValue += 1
-    val opt = getFirstRegularCard(cards)
-    opt match
-      case Some(s) =>
+
+    getFirstRegularCard(cards) match
+      case Some(s) => // iterate from first regular card
         val (start, c) = s
-        for (idx <- start until cards.size) {
+        currentValue = c.value
+        for (idx <- start until cards.size)
+          // always increment current value, so the value of a regular card after a joker can be checked
           increment()
-          cards(idx) match {
+          cards(idx) match
             case r: RegularCard => if(r.value != currentValue) return false
-          }
-        }
         true
-      case _ => true
+      case _ => true // only jokers
   }
 
   def makeGroupedIndexList(indices:String, numberOfInputs:List[Int]):List[List[Int]] =
@@ -106,9 +99,10 @@ object Utils {
       throw new IllegalArgumentException
 
   def getFirstRegularCard(cards: List[Card]): Option[(Int, RegularCard)] =
-    for (i <- 0 to cards.length)
-      cards(i) match
-        case c: RegularCard => return Some((i, c))
+    cards.zipWithIndex.foreach((c, idx) => {
+      cards(idx) match
+        case c: RegularCard => return Some((idx, c))
+    })
     None
 
   abstract class IndexListener:
