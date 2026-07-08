@@ -15,7 +15,7 @@ class CardDeckSpec extends AnyWordSpec {
       playerCardDeck.cards(1).size should be(10)
     }
     "switch card" when {
-      val newCard = new Card(1,8)
+      val newCard = RegularCard(1,8)
       val resNewDeck = playerCardDeck.switchCard(0,0, newCard)
       def newCardDeck = resNewDeck._1
       def removedCard = resNewDeck._2
@@ -68,8 +68,8 @@ class CardDeckSpec extends AnyWordSpec {
     }
     "add a stash" when {
       val stash = List(
-        List(new Card(1,6), new Card(1,7), new Card(2, 5), new Card(3, 1)),
-        List(new Card(4,3), new Card(1,5), new Card(2,11), new Card(3,6))
+        List(RegularCard(1,6), RegularCard(1,7), RegularCard(2, 5), RegularCard(3, 1)),
+        List(RegularCard(4,3), RegularCard(1,5), RegularCard(2,11), RegularCard(3,6))
       )
       val newDiscardedDeck = discardedCardDeck.setCards(0, stash)
       "cards correctly set to player one" in {
@@ -77,7 +77,7 @@ class CardDeckSpec extends AnyWordSpec {
         newDiscardedDeck.cards(1) should be(None)
       }
       "add a single card to the setted stash" when {
-        val newCard = new Card(3, 12)
+        val newCard = RegularCard(3, 12)
         val newDiscardedDeck2 = newDiscardedDeck.appendCard(newCard, 0, 1, INJECT_TO_FRONT)
         "second player should still have None" in {
           newDiscardedDeck.cards(1) should be(None)

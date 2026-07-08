@@ -5,7 +5,7 @@ import controller.ControllerBaseImplement.{Controller, CreatePlayerCommand, Disc
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import utils.{DoCreatePlayerEvent, DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GoToDiscardEvent, ProgramStartedEvent, TurnEndedEvent}
-import model.Card
+import model.{Card, RegularCard}
 
 class TUI_Spec extends AnyWordSpec {
   "A TUI" when {
@@ -25,7 +25,7 @@ class TUI_Spec extends AnyWordSpec {
       s(12) should be("Abzulegende Karten angeben oder n für nicht ablegen:")
     }
     "showing status for current player when his turn starts" in {
-      val s1 = tui.update(new TurnEndedEvent(Card(3,5), true))
+      val s1 = tui.update(new TurnEndedEvent(RegularCard(3,5), true))
       val s = s1.split("\n")
       def initialState2 = initialState.asInstanceOf[GameRunningControllerStateInterface]
       s(0) should be("-" * 32)

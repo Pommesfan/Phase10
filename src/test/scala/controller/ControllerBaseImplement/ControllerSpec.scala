@@ -2,7 +2,7 @@ package controller.ControllerBaseImplement
 
 import controller.{GameRunningControllerStateInterface, ValidatorFactoryInterface}
 import controller.ValidatorBaseImplement.ValidatorFactory
-import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
+import model.{Card, DiscardedCardDeck, PlayerCardDeck, RegularCard, RoundData, TurnData}
 import org.scalatest.matchers.should.Matchers.*
 import org.scalatest.wordspec.AnyWordSpec
 import utils.Utils.{INJECT_AFTER, INJECT_TO_FRONT, NEW_CARD, OPENCARD}
@@ -59,14 +59,14 @@ class ControllerSpec extends AnyWordSpec {
           new TurnData(
             0,
             new PlayerCardDeck(cardStash),
-            Card(2,9),
+            RegularCard(2,9),
             new DiscardedCardDeck(List.fill(2)(None))
           )
         )
         "discard suitable cards successfull" when {
           val state1 = createState(List(
-            List(Card(1,11),Card(2,11),Card(1,11),Card(4,8),Card(2,8),Card(3,8),Card(4,2),Card(1,5),Card(4,12),Card(2,1)),
-            List(Card(1,11),Card(4,7),Card(1,11),Card(4,9),Card(2,8),Card(2,5),Card(4,2),Card(1,5),Card(2,3),Card(2,1))
+            List(RegularCard(1,11),RegularCard(2,11),RegularCard(1,11),RegularCard(4,8),RegularCard(2,8),RegularCard(3,8),RegularCard(4,2),RegularCard(1,5),RegularCard(4,12),RegularCard(2,1)),
+            List(RegularCard(1,11),RegularCard(4,7),RegularCard(1,11),RegularCard(4,9),RegularCard(2,8),RegularCard(2,5),RegularCard(4,2),RegularCard(1,5),RegularCard(2,3),RegularCard(2,1))
           ))
 
           val state2 = state1.discardCards(indices, new Controller)._1.asInstanceOf[SwitchCardControllerState]
@@ -86,8 +86,8 @@ class ControllerSpec extends AnyWordSpec {
         }
         "discard unsuitable cards unsuccessfull" when {
           val state1 = createState(List(
-            List(Card(1,11),Card(2,8),Card(1,11),Card(4,8),Card(2,8),Card(3,11),Card(4,2),Card(1,5),Card(4,12),Card(2,1)),
-            List(Card(1,11),Card(4,7),Card(1,11),Card(4,9),Card(2,8),Card(2,5),Card(4,2),Card(1,5),Card(2,3),Card(2,1))
+            List(RegularCard(1,11),RegularCard(2,8),RegularCard(1,11),RegularCard(4,8),RegularCard(2,8),RegularCard(3,11),RegularCard(4,2),RegularCard(1,5),RegularCard(4,12),RegularCard(2,1)),
+            List(RegularCard(1,11),RegularCard(4,7),RegularCard(1,11),RegularCard(4,9),RegularCard(2,8),RegularCard(2,5),RegularCard(4,2),RegularCard(1,5),RegularCard(2,3),RegularCard(2,1))
           ))
 
           val state2 = state1.discardCards(indices, new Controller)._1.asInstanceOf[SwitchCardControllerState]
@@ -105,8 +105,8 @@ class ControllerSpec extends AnyWordSpec {
         }
         "Select None to discard" when {
           val state1 = createState(List(
-            List(Card(1,11),Card(2,11),Card(1,11),Card(4,8),Card(2,8),Card(3,8),Card(4,2),Card(1,5),Card(4,12),Card(2,1)),
-            List(Card(1,11),Card(4,7),Card(1,11),Card(4,9),Card(2,8),Card(2,5),Card(4,2),Card(1,5),Card(2,3),Card(2,1))
+            List(RegularCard(1,11),RegularCard(2,11),RegularCard(1,11),RegularCard(4,8),RegularCard(2,8),RegularCard(3,8),RegularCard(4,2),RegularCard(1,5),RegularCard(4,12),RegularCard(2,1)),
+            List(RegularCard(1,11),RegularCard(4,7),RegularCard(1,11),RegularCard(4,9),RegularCard(2,8),RegularCard(2,5),RegularCard(4,2),RegularCard(1,5),RegularCard(2,3),RegularCard(2,1))
           ))
 
           val state2 = state1.skipDiscard(new Controller)._1.asInstanceOf[SwitchCardControllerState]
@@ -127,21 +127,22 @@ class ControllerSpec extends AnyWordSpec {
     }
     "Inject card to player itself or another if he has already discarded and cards fit to discardedStash" when {
       def createState(cardStash:List[List[Card]], discardedStash:List[Option[List[List[Card]]]], currentPlayer:Int) = new InjectControllerState(
-        List("PlayerA", "PlayerB"), new RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
-        new TurnData(currentPlayer, new PlayerCardDeck(cardStash), Card(2,5), new DiscardedCardDeck(discardedStash))
+        List("PlayerA", "PlayerB"), RoundData(List.fill(2)(validatorFactory.getValidator(1)), List.fill(2)(0)),
+        TurnData(currentPlayer, new PlayerCardDeck(cardStash), RegularCard(2,5), new DiscardedCardDeck(discardedStash))
       )
 
       "process without discarding None" when {
         val stash = List(
           List(),
-          List(Card(2,3),Card(3,8),Card(4,1),Card(2,9))
+          List(RegularCard(2,3),RegularCard(3,8),RegularCard(4,1),RegularCard(2,9))
         )
         val discardedStash = List(
           None,
-          Some(List(List(Card(1,11),Card(3,11),Card(4,11)), List(Card(3,5),Card(4,5),Card(1,5))))
+          Some(List(List(RegularCard(1,11),RegularCard(3,11),RegularCard(4,11)), List(RegularCard(3,5),RegularCard(4,5),RegularCard(1,5))))
         )
         val state1 = createState(stash, discardedStash, 1)
-        val state2 = state1.skipInject(new Controller)._1.asInstanceOf[SwitchCardControllerState]
+        val state2 = state1.skipInject(new Controller)._1
+
         def t1 = state1.t
         def t2 = state2.t
         "change to next player" in {
@@ -155,12 +156,12 @@ class ControllerSpec extends AnyWordSpec {
       }
       "process with fitting card" when {
         val stash = List(
-          List(Card(2,4),Card(3,8),Card(1,10),Card(2,11)),
-          List(Card(2,3),Card(3,5),Card(4,1),Card(2,9))
+          List(RegularCard(2,4),RegularCard(3,8),RegularCard(1,10),RegularCard(2,11)),
+          List(RegularCard(2,3),RegularCard(3,5),RegularCard(4,1),RegularCard(2,9))
         )
         val discardedStash = List(
-          Some(List(List(Card(3,5),Card(2,5),Card(1,5)),List(Card(4,12),Card(3,12),Card(1,12)))),
-          Some(List(List(Card(3,8),Card(4,8),Card(1,8)),List(Card(1,11),Card(3,11),Card(4,11))))
+          Some(List(List(RegularCard(3,5),RegularCard(2,5),RegularCard(1,5)),List(RegularCard(4,12),RegularCard(3,12),RegularCard(1,12)))),
+          Some(List(List(RegularCard(3,8),RegularCard(4,8),RegularCard(1,8)),List(RegularCard(1,11),RegularCard(3,11),RegularCard(4,11))))
         )
 
         val receiving_player = 0
@@ -188,12 +189,12 @@ class ControllerSpec extends AnyWordSpec {
       "When inject card with only one left, end round" when {
         val c = new Controller
         val playerCardDeck = new PlayerCardDeck(List(
-          List(Card(2,8)),
-          List(Card(2,3),Card(3,5),Card(4,1),Card(2,9)))
+          List(RegularCard(2,8)),
+          List(RegularCard(2,3),RegularCard(3,5),RegularCard(4,1),RegularCard(2,9)))
         )
         val discardedCardDeck = new DiscardedCardDeck(List(
-          Some(List(List(Card(3,8),Card(4,8),Card(1,8)),List(Card(1,11),Card(3,11),Card(4,11)))),
-          Some(List(List(Card(3,8),Card(4,8),Card(1,8)),List(Card(1,11),Card(3,11),Card(4,11)))))
+          Some(List(List(RegularCard(3,8),RegularCard(4,8),RegularCard(1,8)),List(RegularCard(1,11),RegularCard(3,11),RegularCard(4,11)))),
+          Some(List(List(RegularCard(3,8),RegularCard(4,8),RegularCard(1,8)),List(RegularCard(1,11),RegularCard(3,11),RegularCard(4,11)))))
         )
         val state1 = new InjectControllerState(
           List("PlayerA", "PlayerB"),
@@ -209,7 +210,7 @@ class ControllerSpec extends AnyWordSpec {
         val t2 = state3.t
 
         "player have discarded and get in phase 2" in {
-          state3.r.validators.foreach(v => v.getNumberOfPhase() should be(2))
+          state3.r.validators.foreach(v => v.getNumberOfPhase should be(2))
         }
 
         "have cardstashes of 10 and empty discardedStashes" in {

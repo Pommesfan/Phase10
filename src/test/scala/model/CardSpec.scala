@@ -5,7 +5,7 @@ import model.Card
 
 class CardSpec extends AnyWordSpec {
   "A Card " when {
-    val cards_to_compare = List(Card(3, 8), Card(3, 8), Card(4, 8), Card(3, 9), Card(1, 7), Card(2, 5), Card(1, 10))
+    val cards_to_compare = List(RegularCard(3, 8), RegularCard(3, 8), RegularCard(4, 8), RegularCard(3, 9), RegularCard(1, 7), RegularCard(2, 5), RegularCard(1, 10))
     "atrributes are correctly set" in {
       cards_to_compare(5).color should be(2)
       cards_to_compare(5).value should be(5)
