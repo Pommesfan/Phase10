@@ -13,13 +13,13 @@ class UndoManager[C <: ControllerInterface]:
 
   def undoStep(c:C):(ControllerStateInterface, OutputEvent) =
     undoStack match
-      case Nil => (c.getInitialState(), new ProgramStartedEvent)
+      case Nil => (c.getInitialState, new ProgramStartedEvent)
       case head :: stack =>
         val res = head.undoStep(c)
         undoStack = stack
         redoStack = head :: redoStack
         res
         
-  def reset() =
+  def reset(): Unit =
     undoStack = Nil
     redoStack = Nil

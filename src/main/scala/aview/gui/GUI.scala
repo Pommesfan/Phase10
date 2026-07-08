@@ -9,7 +9,7 @@ import utils.{GameEndedEvent, GameStartedEvent, Observer, OutputEvent, ProgramSt
 
 class GUI(controller: ControllerInterface) extends JFXApp3 with Observer:
   private var playingField:PlayingField = null
-  def activate() =
+  def activate(): Unit =
     controller.add(this)
     new Thread {
       override def run(): Unit = main(Array(""))

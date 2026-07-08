@@ -42,8 +42,8 @@ class FileIoJson extends FileIoInterface {
       "state" -> JsNumber(getStateNumber(state).id),
       "players" -> JsArray(state.players.map(p => JsString(p))),
       "RoundData" -> JsObject(Seq(
-        "numberofPhase" -> JsArray(r.validators.map(v => JsNumber(v.getNumberOfPhase())).toSeq),
-        "errorPoints" -> JsArray(r.errorPoints.map(n => JsNumber(n)).toSeq)
+        "numberofPhase" -> JsArray(r.validators.map(v => JsNumber(v.getNumberOfPhase))),
+        "errorPoints" -> JsArray(r.errorPoints.map(n => JsNumber(n)))
       )),
       "TurnData" -> JsObject(Seq(
         "newCard" -> getNewCard(state),

@@ -21,18 +21,18 @@ class PlayerCardDeck(val cards: List[List[Card]]):
 
   def getErrorpoints(idx: Int):Int = cards(idx).map(c => c.errorPoints).sum
 
-  def isEmpty(player:Int) = cards(player).isEmpty
+  def isEmpty(player:Int): Boolean = cards(player).isEmpty
 
 class DiscardedCardDeck(val cards: List[Option[List[List[Card]]]]):
-  def setCards(player:Int, pCards: List[List[Card]]) =
+  def setCards(player:Int, pCards: List[List[Card]]): DiscardedCardDeck =
     if(cards(player).nonEmpty)
       throw new UnsupportedOperationException
     else
       new DiscardedCardDeck(cards.updated(player, Some(pCards)))
 
-  def isEmpty(player:Int) = cards(player).isEmpty
+  def isEmpty(player:Int): Boolean = cards(player).isEmpty
 
-  def appendCard(card:Card, receiving_player:Int, stashIndex:Int, position:Int) =
+  def appendCard(card:Card, receiving_player:Int, stashIndex:Int, position:Int): DiscardedCardDeck =
     if(isEmpty(receiving_player))
       throw new UnsupportedOperationException
     else
@@ -40,7 +40,7 @@ class DiscardedCardDeck(val cards: List[Option[List[List[Card]]]]):
       def subStash = discardedCards(stashIndex)
       def newSubStash = position match {
         case INJECT_TO_FRONT => card :: subStash
-        case INJECT_AFTER => (card :: (subStash).reverse).reverse
+        case INJECT_AFTER => (card :: subStash.reverse).reverse
         case _ => throw new IllegalArgumentException
       }
       def newPlayerStash = discardedCards.updated(stashIndex, newSubStash)

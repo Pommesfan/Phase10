@@ -16,7 +16,7 @@ class TUI(controller: ControllerInterface) extends Observer {
 
   private var mode = 0
 
-  val sc = new Scanner(System.in)
+  private val sc = new Scanner(System.in)
 
   def start(): Unit =
     controller.add(this)
@@ -27,7 +27,7 @@ class TUI(controller: ControllerInterface) extends Observer {
           input match {
             case "undo" => controller.undo
             case "exit" => System.exit(0)
-            case "save" => controller.save
+            case "save" => controller.save()
             case _ =>
               val inputEvent_try = Try(createInputEvent(input, mode))
               inputEvent_try match {
@@ -39,15 +39,17 @@ class TUI(controller: ControllerInterface) extends Observer {
 
   def createInputEvent(input:String, mode:Int):InputEvent = mode match
     case CREATE_PLAYERS => new DoCreatePlayerEvent(input.split(" ").toList)
-    case SWITCH => {
+    case SWITCH =>
       val inputs = input.split(" ").toList
-      def index = inputs(0)
+
+      def index = inputs.head
+
       def mode = inputs(1) match {
         case "new" => NEW_CARD
         case "open" => OPENCARD
       }
-      new DoSwitchCardEvent(inputs(0).toInt, mode)
-    }
+
+      new DoSwitchCardEvent(inputs.head.toInt, mode)
     case DISCARD =>
       if(input == "n")
         new DoNoDiscardEvent
@@ -74,7 +76,7 @@ class TUI(controller: ControllerInterface) extends Observer {
         val r = g._1
         val t = g._2
         def currentPlayer = t.current_player
-        val playerName = controller.getPlayers()
+        val playerName = controller.getPlayers
         e match
           case e1: GoToInjectEvent =>
             mode = INJECT
@@ -97,20 +99,20 @@ class TUI(controller: ControllerInterface) extends Observer {
     println(s)
     s
 
-  def printNewTurn(playerNames:List[String], t:TurnData, newCard:Card):String =
+  private def printNewTurn(playerNames:List[String], t:TurnData, newCard:Card):String =
     printDiscardedCards(playerNames, t.discardedCardDeck) + printPlayerStatus(playerNames(t.current_player), t.playerCardDeck.cards(t.current_player), t.openCard, newCard) +
       "\nAuszutauschende Karte angeben + Offenliegende oder neue nehmen (open/new)"
 
-  def printNewRound(playerNames:List[String], r:RoundData): String =
+  private def printNewRound(playerNames:List[String], r:RoundData): String =
     val s = new StringBuilder
     s.append("\nNeue Runde\n")
     playerNames.indices.foreach { idx =>
       def v = r.validators(idx)
-      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.getNumberOfPhase().toString + ": " + v.description + "\n")
+      s.append(playerNames(idx) + ": " + r.errorPoints(idx).toString + " Fehlerpunkte; Phase: " + v.getNumberOfPhase.toString + ": " + v.description + "\n")
     }
     s.toString()
 
-  def printPlayerStatus(player: String, cards: List[Card], openCard: Card, newCard:Card) : String =
+  private def printPlayerStatus(player: String, cards: List[Card], openCard: Card, newCard:Card) : String =
     val sb = new StringBuilder
     sb.append("Aktueller Spieler: " + player)
     sb.append("\n\nNeue Karte:\n")
@@ -120,13 +122,13 @@ class TUI(controller: ControllerInterface) extends Observer {
     sb.append("\n\n" + printCards(cards))
     sb.toString()
 
-  def printCards(cards: List[Card]): String =
+  private def printCards(cards: List[Card]): String =
     val sb = new StringBuilder
     sb.append("Karten des Spielers:\n")
     cards.zipWithIndex.foreach((c,i) => sb.append(i.toString + ": " + c.toString + '\n'))
     sb.toString()
 
-  def printDiscardedCards(playerNames:List[String], discardedCardDeck: DiscardedCardDeck): String =
+  private def printDiscardedCards(playerNames:List[String], discardedCardDeck: DiscardedCardDeck): String =
     val sb = new StringBuilder
     sb.append("-"*32 + '\n')
     sb.append("Abgelegte Karten\n")
@@ -145,6 +147,6 @@ class TUI(controller: ControllerInterface) extends Observer {
     val g = controller.getGameData
     def r = g._1
     def t = g._2
-    def numberOfInputs = r.validators(t.current_player).getNumberOfInputs()
+    def numberOfInputs = r.validators(t.current_player).getNumberOfInputs
     Utils.makeGroupedIndexList(input, numberOfInputs)
 }

@@ -35,7 +35,7 @@ class Controller @Inject() extends ControllerInterface:
   def createNewRound(r:RoundData, cardStashes: List[List[Card]], discarded:List[Boolean]):RoundData =
     def updateValidators() = r.validators.indices.map { idx =>
       if(discarded(idx))
-        validatorFactory.getValidator(r.validators(idx).getNumberOfPhase() + 1)
+        validatorFactory.getValidator(r.validators(idx).getNumberOfPhase + 1)
       else
         r.validators(idx)
     }.toList
@@ -46,9 +46,9 @@ class Controller @Inject() extends ControllerInterface:
 
   private def createCheat = List(RegularCard(1,11), RegularCard(2,11), RegularCard(4,11), RegularCard(3,7), RegularCard(1,7), RegularCard(4,7), createCard, createCard, createCard, createCard)
 
-  def getInitialState():ControllerStateInterface = new InitialState(validatorFactory)
+  def getInitialState: ControllerStateInterface = new InitialState(validatorFactory)
 
-  private var state:ControllerStateInterface = getInitialState()
+  private var state:ControllerStateInterface = getInitialState
   def getState: ControllerStateInterface = state
   
   def getGameData: (RoundData, TurnData) =
@@ -57,7 +57,7 @@ class Controller @Inject() extends ControllerInterface:
 
   def reset_undo_manager(): Unit = undoManager.reset()
 
-  def getPlayers(): List[String] = state.asInstanceOf[GameRunningControllerStateInterface].players
+  def getPlayers: List[String] = state.asInstanceOf[GameRunningControllerStateInterface].players
 
   def solve(e: InputEvent, executePlatform_runLater:Boolean = true):ControllerStateInterface =
     val command = e match {
@@ -83,7 +83,7 @@ class Controller @Inject() extends ControllerInterface:
     Platform.runLater(() => notifyObservers(res._2))
     state
 
-  def save: Unit = fileIO.save(state.asInstanceOf[GameRunningControllerStateInterface])
+  def save(): Unit = fileIO.save(state.asInstanceOf[GameRunningControllerStateInterface])
 
 
 class InitialState(validator: ValidatorFactoryInterface) extends ControllerStateInterface:
@@ -175,7 +175,7 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
 
   private def getWinningPlayer(playersHaveDiscarded: List[Boolean], newErrorpoints: List[Int]): Int =
     r.validators.zipWithIndex
-      .filter((v,idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx))
+      .filter((v,idx) => v.getNumberOfPhase == 10 && playersHaveDiscarded(idx))
       .map((_,idx) => idx)
       .minBy(idx => newErrorpoints(idx))
 
@@ -184,17 +184,19 @@ class InjectControllerState(pPlayers: List[String], pR:RoundData, pT:TurnData) e
 
     val (newDeck, _) = t.playerCardDeck.removeSingleCard(0, currentPlayer)
 
-    if(r.validators.zipWithIndex.exists((v, idx) => v.getNumberOfPhase() == 10 && playersHaveDiscarded(idx)))
+    if(r.validators.zipWithIndex.exists((v, idx) => v.getNumberOfPhase == 10 && playersHaveDiscarded(idx)))
       controller.reset_undo_manager()
       val newErrorPoints = r.errorPoints.zipWithIndex.map((e,idx) => e + newDeck.getErrorpoints(idx))
       val event = GameEndedEvent(
         players(getWinningPlayer(playersHaveDiscarded, newErrorPoints)),
         players,
         r.validators.zipWithIndex.map((v, idx) =>
-          if (playersHaveDiscarded(idx)) v.getNumberOfPhase()
-          else v.getNumberOfPhase() - 1),
+          if(playersHaveDiscarded(idx))
+            v.getNumberOfPhase
+          else
+            v.getNumberOfPhase - 1),
         newErrorPoints) //add new error points
-      (controller.getInitialState(), event)
+      (controller.getInitialState, event)
     else
       val newState = new SwitchCardControllerState(
         players,

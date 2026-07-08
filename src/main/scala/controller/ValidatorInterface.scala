@@ -8,9 +8,9 @@ trait ValidatorStrategyInterface:
 
   def description:String
 
-  def getNumberOfPhase(): Int
+  def getNumberOfPhase: Int
 
-  def getNumberOfInputs(): List[Int]
+  def getNumberOfInputs: List[Int]
 
   def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean
 

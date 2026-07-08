@@ -27,8 +27,8 @@ private class CardGroup(val groupType:GroupType.Value, val numberOfCards:Int)
 private abstract class ValidatorStrategy(val numberOfPhase:Int) extends ValidatorStrategyInterface:
   protected val cardGroups: List[CardGroup]
   private def group_types = cardGroups.map(cg => cg.groupType)
-  def getNumberOfPhase(): Int = numberOfPhase
-  def getNumberOfInputs(): List[Int] = cardGroups.map(cg => cg.numberOfCards)
+  def getNumberOfPhase: Int = numberOfPhase
+  def getNumberOfInputs: List[Int] = cardGroups.map(cg => cg.numberOfCards)
   def validate(cards: List[Card], selectedCardIndexes:List[List[Int]]): Boolean =
     //no cards-index selected multiple
     if(!Utils.indexesUnique(selectedCardIndexes.flatten)) return false

@@ -19,7 +19,7 @@ class FileIoXml extends FileIoInterface:
   }
 
   private def cardToXML(card:Card) = card match {
-    case c: RegularCard => {
+    case c: RegularCard =>
       <type>
         {"Regular"}
       </type>
@@ -29,7 +29,6 @@ class FileIoXml extends FileIoInterface:
       <value>
         {c.value}
       </value>
-    }
     case _: JokerCard =>
       <type>
         {"Joker"}
@@ -49,7 +48,7 @@ class FileIoXml extends FileIoInterface:
       <numberOfPhase type="array">
         {r.validators.map(v =>
           <value>
-            {v.getNumberOfPhase()}
+            {v.getNumberOfPhase}
           </value>)}
       </numberOfPhase>
       <errorPoints type="array">

@@ -26,16 +26,17 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
   private var selectedPlayerToInject = -1
   private var selected_stash_to_inject = -1
   private var selected_position_to_inject = -1
-  private val players = controller.getPlayers()
+  private val players = controller.getPlayers
   private val listToSelect = new ListBuffer[Int]()
 
-  var selectNewOrOpenCard = -1
+  var selectNewOrOpenCard: Int = -1
 
-  def getPlayerCardView(t:TurnData) = t.playerCardDeck.cards(t.current_player).indices.map(idx =>
+  private def getPlayerCardView(t:TurnData) = t.playerCardDeck.cards(t.current_player).indices.map(idx =>
     new CardView(t.playerCardDeck.cards(t.current_player)(idx), Some(new IndexListener {
       override val index: Int = idx
+
       override def onListen(index: Int): Unit = if (mode == SWITCH || mode == INJECT) selectedPlayerCard = index else listToSelect.append(index)
-  }))).toSeq
+    })))
 
   fill = Color.AliceBlue
 
@@ -74,7 +75,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
               new VBox {
                 //Buttons
                 children = Seq(
-                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).getNumberOfPhase() + ": " + r.validators(t.current_player).description),
+                  new Text("Aktueller Spieler: " + players(t.current_player) + "; Phase " + r.validators(t.current_player).getNumberOfPhase + ": " + r.validators(t.current_player).description),
                   new Button("Tauschen") {
                     disable = !(mode == SWITCH)
                     onMouseClicked = e => if(selectedPlayerCard != -1 && selectNewOrOpenCard != -1)controller.solve(new DoSwitchCardEvent(selectedPlayerCard, selectNewOrOpenCard))
@@ -85,7 +86,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
                       def g = controller.getGameData
                       def r = g._1
                       def t = g._2
-                      val groupedCardIndexes = Utils.groupCardIndexes(listToSelect.toList, r.validators(t.current_player).getNumberOfInputs())
+                      val groupedCardIndexes = Utils.groupCardIndexes(listToSelect.toList, r.validators(t.current_player).getNumberOfInputs)
                       controller.solve(new DoDiscardEvent(groupedCardIndexes))
                   },
                   new Button("Anlegen") {
@@ -116,10 +117,10 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
       },
       new Text("Abgelegte Karten:"),
       showDiscardedCards(t.discardedCardDeck)
-    ),
+    )
   }
 
-  def showDiscardedCards(discardedCardDeck: DiscardedCardDeck): VBox = {
+   private def showDiscardedCards(discardedCardDeck: DiscardedCardDeck): VBox = {
     val vbox = new VBox()
     for(p <- players.indices)
       vbox.getChildren.add(new Text(players(p)))
@@ -140,7 +141,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     vbox
   }
 
-  def show_new_Round_Dialog(players:List[String], r: RoundData, t:TurnData): Unit = new Alert(AlertType.Information) {
+  private def show_new_Round_Dialog(players:List[String], r: RoundData, t:TurnData): Unit = new Alert(AlertType.Information) {
     val build = new StringBuilder
     resizable = true
     def createString():Unit = players.zipWithIndex.map { p =>
@@ -154,7 +155,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
     contentText = build.toString()
   }.showAndWait()
 
-  def moveUnvalidDialog(): Unit = new Alert(AlertType.Information) {
+  private def moveUnvalidDialog(): Unit = new Alert(AlertType.Information) {
     resizable = true
     headerText = "Ungültiger Spielzug"
   }.showAndWait()
@@ -177,7 +178,7 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
 
   content = createField(controller.getGameData._1, controller.getGameData._2, Some(newCardInitial))
 
-  def update(e:OutputEvent) =
+  def update(e:OutputEvent): Unit =
     def r = controller.getGameData._1
     def t = controller.getGameData._2
     e match
