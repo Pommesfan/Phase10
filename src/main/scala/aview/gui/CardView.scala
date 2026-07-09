@@ -13,6 +13,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
   private val TWO_DIGIT_WIDTH_PROPORTION = 1.2
   private val JOKER_SIZE_PROPORTION = 0.4
   private val JOKER_WIDTH_PROPORTION = 0.8
+  private val NUMBER_POS_CORRECTION_FACTOR = 0.1
   private val FONT_TYPE = "Arial"
   private val SHADOW_FACTOR = 4
   private val CARD_ARC_FACTOR = 4.5
@@ -86,7 +87,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
       val numberSize = CARD_WIDTH * NUMBER_SIZE_PROPORTION
       val numberWidth = if(c.value < 10) numberSize * ONE_DIGIT_WIDTH_PROPORTION else numberSize * TWO_DIGIT_WIDTH_PROPORTION
       val posX = (CARD_WIDTH - numberWidth) / 2
-      val posY = (cardHeight + numberSize) / 2
+      val posY = (cardHeight + numberSize) / 2 - cardHeight * NUMBER_POS_CORRECTION_FACTOR
       gc.setFont(new Font(FONT_TYPE, numberSize))
       gc.fillText(c.value.toString, posX, posY, numberWidth)
     case _: JokerCard =>
