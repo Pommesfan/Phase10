@@ -60,7 +60,7 @@ class CardView(card:Card, indexListener: Option[IndexListener]) extends Canvas {
 
   private def shadowColor = cardColor match {
     case Color.Red => Color.OrangeRed
-    case Color.Yellow => Color.LightYellow
+    case Color.Yellow => Color.Yellow
     case Color.Blue => Color.DeepSkyBlue
     case Color.Green => Color.LawnGreen
     case Color.Gray => Color.LightGray

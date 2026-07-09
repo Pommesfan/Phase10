@@ -13,7 +13,6 @@ import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
 import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameEndedEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, CARD_PROPORTION, CARD_WIDTH}
 import aview.gui.CardView
-
 import scala.collection.mutable.ListBuffer
 
 class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends Scene {

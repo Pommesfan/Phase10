@@ -30,28 +30,14 @@ object Utils {
     true
   }
 
-  def resolveMultiples(cards : List[Card]): Boolean = {
+  def resolveSameValue(cards : List[Card], f: RegularCard => Int): Boolean = {
     getFirstRegularCard(cards) match
       case some: Some[(Int, RegularCard)] =>
-        val commonValue = some.value._2.value
+        val commonValue = f(some.value._2)
         for (c <- cards)
           c match
             case r: RegularCard =>
-              if (r.value != commonValue)
-                return false // case one regular card differs from first regular
-            case _ => // jokers are always valid
-        true
-      case _ => true // only jokers
-  }
-
-  def resolveSameColor(cards: List[Card]): Boolean = {
-      getFirstRegularCard(cards) match
-      case some: Some[(Int, RegularCard)] =>
-        val commonColor = some.value._2.color
-        for (c <- cards)
-          c match
-            case r: RegularCard =>
-              if (r.color != commonColor)
+              if (f(r) != commonValue)
                 return false // case one regular card differs from first regular
             case _ => // jokers are always valid
         true

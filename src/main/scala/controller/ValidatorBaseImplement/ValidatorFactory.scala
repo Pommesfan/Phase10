@@ -41,8 +41,8 @@ private abstract class ValidatorStrategy(val numberOfPhase:Int) extends Validato
       def enoughCards = subList.size == number_of_cards
       def validateCardGroup: Boolean = group_types(idx) match
         case GroupType.SEQUENCE => Utils.resolveSequence(subList)
-        case GroupType.MULTIPLES => Utils.resolveMultiples(subList)
-        case GroupType.SAME_COLOR => Utils.resolveSameColor(subList)
+        case GroupType.MULTIPLES => Utils.resolveSameValue(subList, (c: RegularCard) => c.value)
+        case GroupType.SAME_COLOR => Utils.resolveSameValue(subList, (c: RegularCard) => c.color)
 
       if (!(enoughCards && validateCardGroup)) return false
     }
