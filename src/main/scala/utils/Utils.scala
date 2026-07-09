@@ -9,10 +9,9 @@ object Utils {
   val NEW_CARD = 1
   val OPENCARD = 2
 
-  val cardWidth = 120.0
-  val cardProportion = 1.5
-  val NumberSizeProportion = 1.0
-  val space_between_cardstashes = 8
+  val CARD_WIDTH = 120.0
+  val CARD_PROPORTION = 1.5
+  val SPACE_BETWEEN_CARDSTASHES = 8
   val JOKER_PROBABILITY = 0.05
 
   private val r = new Random()

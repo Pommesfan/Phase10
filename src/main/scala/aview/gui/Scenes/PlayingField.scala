@@ -11,7 +11,7 @@ import scalafx.scene.shape.Rectangle
 import controller.ControllerInterface
 import model.{Card, DiscardedCardDeck, PlayerCardDeck, RoundData, TurnData}
 import utils.{DoDiscardEvent, DoInjectEvent, DoNoDiscardEvent, DoNoInjectEvent, DoSwitchCardEvent, GameEndedEvent, GameStartedEvent, GoToDiscardEvent, GoToInjectEvent, NewRoundEvent, OutputEvent, TurnEndedEvent, Utils}
-import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, cardProportion, cardWidth}
+import Utils.{INJECT_AFTER, INJECT_TO_FRONT, IndexListener, CARD_PROPORTION, CARD_WIDTH}
 import aview.gui.CardView
 
 import scala.collection.mutable.ListBuffer
@@ -56,8 +56,8 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
                     }
                   } else {
                     new Rectangle {
-                      width = cardWidth
-                      height = cardWidth * cardProportion
+                      width = CARD_WIDTH
+                      height = CARD_WIDTH * CARD_PROPORTION
                       arcWidth = 40
                       fill = Color.Transparent
                     }
@@ -210,10 +210,10 @@ class PlayingField(controller: ControllerInterface, newCardInitial:Card) extends
 
   private class SpaceRectangle(val player:Int, val stash:Int, val position:Int) extends Rectangle {
     fill = Color.SaddleBrown
-    arcWidth = cardWidth / 4.5
-    arcHeight = cardWidth / 4.5
-    height = Utils.cardWidth * Utils.cardProportion
-    width = Utils.cardWidth / Utils.space_between_cardstashes
+    arcWidth = CARD_WIDTH / 4.5
+    arcHeight = CARD_WIDTH / 4.5
+    height = Utils.CARD_WIDTH * Utils.CARD_PROPORTION
+    width = Utils.CARD_WIDTH / Utils.SPACE_BETWEEN_CARDSTASHES
     onMouseClicked = e => {
       selectedPlayerToInject = player
       selected_stash_to_inject = stash
