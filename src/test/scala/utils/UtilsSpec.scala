@@ -1,6 +1,6 @@
 package utils
 
-import model.{Card, RegularCard}
+import model.{Card, JokerCard, RegularCard}
 import org.scalatest.wordspec.AnyWordSpec
 import org.scalatest.matchers.should.Matchers.*
 import Utils.{INJECT_AFTER, INJECT_TO_FRONT}
@@ -32,32 +32,44 @@ class UtilsSpec extends AnyWordSpec {
   }
   "checks if cards are a sequence" when {
     "check with suitable cards" in {
-      val cards = List(RegularCard(3,5),RegularCard(1,6),RegularCard(2,7))
-      Utils.resolveSequence(cards) should be(true)
+      val cards1 = List(RegularCard(3,5),RegularCard(1,6),RegularCard(2,7))
+      val cards2 = List(RegularCard(4,12),JokerCard(),RegularCard(1,2))
+      Utils.resolveSequence(cards1) should be(true)
+      Utils.resolveSequence(cards2) should be(true)
     }
     "check with unsuitable cards" in {
-      val cards = List(RegularCard(1,8),RegularCard(4,9),RegularCard(2,11))
-      Utils.resolveSequence(cards) should be(false)
+      val cards1 = List(RegularCard(1,8),RegularCard(4,9),RegularCard(2,11))
+      val cards2 = List(RegularCard(4,3),JokerCard(),RegularCard(1,6))
+      Utils.resolveSequence(cards1) should be(false)
+      Utils.resolveSequence(cards2) should be(false)
     }
   }
   "checks if cards are multiples" when {
     "check with suitable cards" in {
-      val cards = List(RegularCard(1,9),RegularCard(3,9),RegularCard(4,9))
-      Utils.resolveMultiples(cards) should be(true)
+      val cards1 = List(RegularCard(1,9),RegularCard(3,9),RegularCard(4,9))
+      val cards2 = List(RegularCard(1,9),JokerCard(),RegularCard(4,9))
+      Utils.resolveSameValue(cards1, c => c.value) should be(true)
+      Utils.resolveSameValue(cards2, c => c.value) should be(true)
     }
     "check with unsuitable cards" in {
-      val cards = List(RegularCard(2,8),RegularCard(1,7),RegularCard(3,8))
-      Utils.resolveMultiples(cards) should be(false)
+      val cards1 = List(RegularCard(2,8),RegularCard(1,7),RegularCard(3,8))
+      val cards2 = List(RegularCard(2,3),JokerCard(),RegularCard(3,4))
+      Utils.resolveSameValue(cards1, c => c.value) should be(false)
+      Utils.resolveSameValue(cards2, c => c.value) should be(false)
     }
   }
   "checks if cards have same color" when {
     "check with suitable cards" in {
-      val cards = List(RegularCard(3,9),RegularCard(3,1),RegularCard(3,12))
-      Utils.resolveSameColor(cards) should be(true)
+      val cards1 = List(RegularCard(3,9),RegularCard(3,1),RegularCard(3,12))
+      val cards2 = List(RegularCard(1,3),JokerCard(),RegularCard(1,2))
+      Utils.resolveSameValue(cards1, c => c.color) should be(true)
+      Utils.resolveSameValue(cards2, c => c.color) should be(true)
     }
     "check with unsuitable cards" in {
-      val cards = List(RegularCard(1,5),RegularCard(1,2),RegularCard(4,11))
-      Utils.resolveSameColor(cards) should be(false)
+      val cards1 = List(RegularCard(1,5),RegularCard(1,2),RegularCard(4,11))
+      val cards2 = List(RegularCard(3,5),JokerCard(),RegularCard(1,11))
+      Utils.resolveSameValue(cards1, c => c.color) should be(false)
+      Utils.resolveSameValue(cards2, c => c.color) should be(false)
     }
   }
   "fitToSequence checks if card can be injected in front or after an sequence" when {
@@ -67,6 +79,7 @@ class UtilsSpec extends AnyWordSpec {
     "can append card in front of or after" in {
       Utils.fitToSequence(l1, RegularCard(3,5), INJECT_TO_FRONT, 0, l1.head) should be(true)
       Utils.fitToSequence(l1, RegularCard(3,9), INJECT_AFTER, 0, l1.head) should be(true)
+      Utils.fitToSequence(l1, RegularCard(3, 5), INJECT_TO_FRONT, 0, l1.head) should be(true)
       Utils.fitToSequence(l1, RegularCard(3,3), INJECT_TO_FRONT, 0, l1.head) should be(false)
       Utils.fitToSequence(l1, RegularCard(3,11), INJECT_AFTER, 0, l1.head) should be(false)
     }
